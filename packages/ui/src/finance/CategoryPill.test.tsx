@@ -59,4 +59,21 @@ describe('CategoryPill', () => {
     const { container } = render(<CategoryPill category="Clublink" overrides={{ Clublink: 'trophy' }} />)
     expect(container.querySelector('svg')).toHaveAttribute('data-icon', 'trophy')
   })
+
+  it('renders a brand: mark as a filled path rather than an empty stroke glyph', () => {
+    const { container } = render(<CategoryPill category="Spotify" iconName="brand:spotify" />)
+    const svg = container.querySelector('svg')
+    expect(svg).toHaveAttribute('data-icon', 'brand:spotify')
+    expect(svg).toHaveAttribute('stroke', 'none')
+    const path = svg?.querySelector('path')
+    expect(path?.getAttribute('d')).toBeTruthy()
+  })
+
+  it('accepts a brand: mark through the overrides map', () => {
+    const { container } = render(
+      <CategoryPill category="Spotify" overrides={{ Spotify: 'brand:spotify' }} />,
+    )
+    expect(container.querySelector('svg')).toHaveAttribute('data-icon', 'brand:spotify')
+    expect(container.querySelector('svg path')?.getAttribute('d')).toBeTruthy()
+  })
 })

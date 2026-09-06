@@ -1,6 +1,7 @@
 import * as React from 'react'
 import './CategoryPill.css'
 import { GLYPHS, type IconName } from '../core/Icon'
+import { LOGOS, type BrandSlug } from '../core/brandGlyphs'
 import { categoryVisual, type CategoryOverrides } from './categoryIcon'
 
 /**
@@ -36,7 +37,15 @@ export const CategoryPill = React.forwardRef<HTMLElement, CategoryPillProps>(fun
   const visual = categoryVisual(category, overrides)
   const resolvedIcon = iconName ?? visual.icon
   const tint = color || visual.tint
-  const glyph = icon !== undefined ? icon : GLYPHS[resolvedIcon]
+  // `IconName` spans stroke glyphs and `brand:` marks; the two render differently
+  // (stroked geometry vs. a single filled path), so branch before indexing GLYPHS.
+  const brandSlug = resolvedIcon.startsWith('brand:') ? (resolvedIcon.slice(6) as BrandSlug) : undefined
+  const glyph =
+    icon !== undefined
+      ? icon
+      : brandSlug
+        ? <path d={LOGOS[brandSlug]} />
+        : GLYPHS[resolvedIcon as keyof typeof GLYPHS]
   const text = label != null ? label : (category.charAt(0).toUpperCase() + category.slice(1))
   const sm = size === 'sm'
   const Tag = interactive ? 'button' : 'span'
@@ -56,7 +65,7 @@ export const CategoryPill = React.forwardRef<HTMLElement, CategoryPillProps>(fun
       }}
       {...(props as React.HTMLAttributes<HTMLButtonElement & HTMLSpanElement>)}
     >
-      <svg data-icon={icon === undefined ? resolvedIcon : undefined} width={sm ? 12 : 13} height={sm ? 12 : 13} viewBox="0 0 24 24" fill="none" stroke={tint} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="ca-category-pill-icon">{glyph}</svg>
+      <svg data-icon={icon === undefined ? resolvedIcon : undefined} width={sm ? 12 : 13} height={sm ? 12 : 13} viewBox="0 0 24 24" fill={brandSlug ? tint : 'none'} stroke={brandSlug ? 'none' : tint} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="ca-category-pill-icon">{glyph}</svg>
       {text}
     </Tag>
   )
