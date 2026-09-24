@@ -1,0 +1,51 @@
+/* ConfirmDialog — the `window.confirm` replacement. Layout sits on top of
+   Dialog's card; the tone-specific treatment is keyed off `data-tone`.
+   Interactive states come from Button.css. No raw hex. */
+
+.ca-confirm-dialog {
+  gap: 12px;
+}
+
+/* A confirm is a sentence, not a form — keep the description tight under the
+   title and give the action row a little more air. */
+.ca-confirm-dialog .ca-dialog-description {
+  line-height: 1.5;
+}
+
+.ca-confirm-dialog .ca-dialog-footer {
+  margin-top: 6px;
+}
+
+/* Destructive confirms read as a warning card: a hairline of the destructive
+   tone at the top edge rather than a shouty fill. */
+.ca-confirm-dialog[data-tone='destructive'] {
+  border-color: color-mix(in oklch, var(--destructive) 40%, var(--border));
+}
+
+.ca-confirm-dialog[data-tone='destructive'] .ca-dialog-title {
+  color: var(--destructive);
+}
+
+/* Both action buttons inherit Button.css, including its focus-visible ring;
+   re-stated here so the ring survives a consumer restyling the row. */
+.ca-confirm-dialog-action:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+/* Pending: keep the button's footprint stable so the row does not jump when the
+   spinner appears, and stop the disabled fade from hiding the spinner. */
+.ca-confirm-dialog-action[data-pending='true'] {
+  opacity: 1;
+  cursor: progress;
+}
+
+.ca-confirm-dialog-spinner {
+  flex: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ca-confirm-dialog-action {
+    transition: none;
+  }
+}

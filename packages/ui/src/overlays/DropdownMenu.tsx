@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useDismissLayer } from './dismissStack'
 import './DropdownMenu.css'
 
 export interface DropdownItem {
@@ -16,9 +17,11 @@ export interface DropdownItem {
  * select. `items` are rows; set `separator: true` for a divider, `danger` for
  * destructive rows. `align` pins the menu to the trigger's start or end edge.
  *
- * Open/close is behavior and stays in JS (the `open` state, outside-click and
- * Escape listeners). Item hover/focus styling lives in `DropdownMenu.css` —
- * menu items carry a `:focus-visible` ring.
+ * Open/close is behavior and stays in JS (the `open` state and the outside-click
+ * listener). Escape goes through the shared dismiss stack rather than a private
+ * `document` listener, so an open menu inside a Dialog takes Escape for itself
+ * and the Dialog underneath stays open. Item hover/focus styling lives in
+ * `DropdownMenu.css` — menu items carry a `:focus-visible` ring.
  */
 export interface DropdownMenuProps {
   trigger: React.ReactNode
@@ -41,13 +44,16 @@ export const DropdownMenu = React.forwardRef<HTMLSpanElement, DropdownMenuProps>
   const ref = React.useRef<HTMLSpanElement>(null)
   React.useImperativeHandle(forwardedRef, () => ref.current as HTMLSpanElement)
 
+  const close = React.useCallback(() => setOpen(false), [])
+  // Escape is handled by the shared dismiss stack, not a private listener: the
+  // menu is the topmost layer while open, so it closes alone.
+  useDismissLayer({ active: open, onDismiss: close })
+
   React.useEffect(() => {
     if (!open) return
     const onDoc = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false) }
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(false) }
     document.addEventListener('mousedown', onDoc)
-    document.addEventListener('keydown', onKey)
-    return () => { document.removeEventListener('mousedown', onDoc); document.removeEventListener('keydown', onKey) }
+    return () => document.removeEventListener('mousedown', onDoc)
   }, [open])
 
   return (

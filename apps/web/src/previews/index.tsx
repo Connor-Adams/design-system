@@ -49,16 +49,41 @@ import {
   Breadcrumb,
   Pagination,
   // overlays
+  ConfirmDialog,
   Dialog,
   DropdownMenu,
   Toast,
   Tooltip,
+  useConfirm,
 } from '@connor-adams/designsystem'
 
 // ---------------------------------------------------------------------------
 // Controlled wrappers — defined as named function components so hooks are valid
 // (module is already 'use client')
 // ---------------------------------------------------------------------------
+
+function UseConfirmPreview(): React.JSX.Element {
+  const { confirm, dialog } = useConfirm({ tone: 'destructive', confirmLabel: 'Delete' })
+  const [answer, setAnswer] = React.useState('—')
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+      <Button
+        variant="destructive"
+        onClick={async () => {
+          const ok = await confirm({
+            title: 'Delete sound?',
+            description: 'The clip and its soundboard button are removed.',
+          })
+          setAnswer(ok ? 'confirmed' : 'cancelled')
+        }}
+      >
+        Delete sound
+      </Button>
+      <span style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-body-sm)' }}>Last answer: {answer}</span>
+      {dialog}
+    </div>
+  )
+}
 
 function TabsPreview(): React.JSX.Element {
   const [value, setValue] = React.useState('month')
@@ -625,14 +650,53 @@ export const previews: Record<string, Variant[]> = {
     { label: 'Example', node: (
       // `transform` establishes a containing block so the Dialog's position:fixed
       // scrim is contained to this preview cell instead of covering the whole page.
+      // `portal={false}` keeps it in the React tree so that containment applies,
+      // and `lockScroll={false}` stops an always-open preview from freezing the
+      // gallery page.
       <div style={{ position: 'relative', height: 280, overflow: 'hidden', borderRadius: 'var(--radius-md)', transform: 'translateZ(0)' }}>
         <Dialog
           open
+          portal={false}
+          lockScroll={false}
           title="Confirm action"
           description="This action cannot be undone. Are you sure you want to continue?"
         />
       </div>
     )},
+  ],
+
+  'confirm-dialog': [
+    { label: 'Default', node: (
+      <div style={{ position: 'relative', height: 200, overflow: 'hidden', borderRadius: 'var(--radius-md)', transform: 'translateZ(0)' }}>
+        <ConfirmDialog
+          open
+          portal={false}
+          lockScroll={false}
+          title="Save changes?"
+          description="Your edits apply to this account immediately."
+          confirmLabel="Save"
+          onClose={() => {}}
+        />
+      </div>
+    )},
+    { label: 'Destructive (Cancel focused, pending)', node: (
+      <div style={{ position: 'relative', height: 220, overflow: 'hidden', borderRadius: 'var(--radius-md)', transform: 'translateZ(0)' }}>
+        <ConfirmDialog
+          open
+          portal={false}
+          lockScroll={false}
+          tone="destructive"
+          title="Delete transaction?"
+          description="This removes it from all reports. You can't undo this."
+          confirmLabel="Delete"
+          pending
+          onClose={() => {}}
+        >
+          Whole Foods Market · −$84.20 · Groceries
+        </ConfirmDialog>
+      </div>
+    )},
+    { label: 'Imperative useConfirm()', node: <UseConfirmPreview /> },
   ],
 
   'dropdown-menu': [
