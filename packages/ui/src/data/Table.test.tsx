@@ -38,6 +38,29 @@ describe('Table', () => {
     expect(t).toHaveClass('text-sm')
   })
 
+  // maxHeight's whole purpose is a scroll region, so the head must pin to its
+  // top — and it needs an explicit background, or rows scroll through it.
+  it('pins the head cell with an explicit background so rows cannot bleed through', () => {
+    renderTable({ maxHeight: '120px' })
+    const style = getComputedStyle(screen.getByRole('columnheader'))
+    expect(style.position).toBe('sticky')
+    expect(style.top).toBe('0px')
+    expect(style.background).toBeTruthy()
+  })
+
+  it('keeps the bare container class when no containerClassName is given', () => {
+    const { container } = renderTable()
+    expect(container.querySelector('[data-slot="table-container"]')).toHaveClass('ca-table-container')
+  })
+
+  it('merges containerClassName onto the scroll container, not the table', () => {
+    const { container } = renderTable({ containerClassName: 'h-96' })
+    const wrap = container.querySelector('[data-slot="table-container"]')
+    expect(wrap).toHaveClass('ca-table-container')
+    expect(wrap).toHaveClass('h-96')
+    expect(screen.getByRole('table')).not.toHaveClass('h-96')
+  })
+
   it('forwards a ref to the underlying table element', () => {
     const ref = createRef<HTMLTableElement>()
     render(

@@ -15,6 +15,9 @@ import {
   Spinner,
   Text,
   // data
+  DataTable,
+  type DataTableColumn,
+  type DataTableSort,
   LetterAvatar,
   StatCard,
   Table, TableHeader, TableBody, TableRow, TableHead, TableCell,
@@ -87,6 +90,63 @@ function UseConfirmPreview(): React.JSX.Element {
       <span style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-body-sm)' }}>Last answer: {answer}</span>
       {dialog}
     </div>
+  )
+}
+
+interface PreviewTxn {
+  id: string
+  date: string
+  merchant: string
+  amount: number
+}
+
+const previewTxns: PreviewTxn[] = [
+  { id: 'p1', date: 'Jun 15', merchant: 'Whole Foods Market', amount: -94.32 },
+  { id: 'p2', date: 'Jun 14', merchant: 'Acme Corp Payroll', amount: 4250 },
+  { id: 'p3', date: 'Jun 13', merchant: 'Netflix Subscription', amount: -18.99 },
+]
+
+const previewMoney = (n: number): string =>
+  `${n < 0 ? '\u2212' : '+'}$${Math.abs(n).toFixed(2)}`
+
+const previewColumns: DataTableColumn<PreviewTxn>[] = [
+  { key: 'date', header: 'Date', width: 90, sortable: true },
+  { key: 'merchant', header: 'Merchant', sortable: true },
+  {
+    key: 'amount',
+    header: 'Amount',
+    align: 'right',
+    width: 120,
+    sortable: true,
+    render: (t) => (
+      <span style={{ fontWeight: 600, color: t.amount < 0 ? 'var(--negative)' : 'var(--positive)' }}>
+        {previewMoney(t.amount)}
+      </span>
+    ),
+  },
+]
+
+function DataTablePreview(): React.JSX.Element {
+  const [sort, setSort] = React.useState<DataTableSort | null>({ key: 'amount', direction: 'desc' })
+  const rows = React.useMemo(() => {
+    if (!sort) return previewTxns
+    const dir = sort.direction === 'asc' ? 1 : -1
+    return [...previewTxns].sort((a, b) => {
+      const x = a[sort.key as keyof PreviewTxn]
+      const y = b[sort.key as keyof PreviewTxn]
+      if (typeof x === 'number' && typeof y === 'number') return (x - y) * dir
+      return String(x).localeCompare(String(y)) * dir
+    })
+  }, [sort])
+  return (
+    <DataTable
+      columns={previewColumns}
+      rows={rows}
+      getRowKey={(t) => t.id}
+      sort={sort}
+      onSortChange={setSort}
+      aria-label="Recent transactions"
+    />
   )
 }
 
@@ -647,6 +707,21 @@ export const previews: Record<string, Variant[]> = {
   ],
 
   // --- data -----------------------------------------------------------------
+  'data-table': [
+    { label: 'Sortable', node: <DataTablePreview /> },
+    { label: 'Loading', node: (
+      <DataTable columns={previewColumns} rows={[]} getRowKey={(t) => t.id} loading loadingRows={3} />
+    )},
+    { label: 'Empty', node: (
+      <DataTable
+        columns={previewColumns}
+        rows={[]}
+        getRowKey={(t) => t.id}
+        empty={<EmptyState title="No transactions" description="Import a statement to get started." />}
+      />
+    )},
+  ],
+
   'letter-avatar': [
     { label: 'Sizes', node: (
       <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
