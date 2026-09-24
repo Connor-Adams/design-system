@@ -1,6 +1,6 @@
 # Cashflow Design System
 
-> React component library (@connor-adams/designsystem). 45 components across 7 categories. All components are imported from the package root.
+> React component library (@connor-adams/designsystem). 46 components across 7 categories. All components are imported from the package root.
 
 Full inventory with prop schemas: /components.json
 
@@ -10,7 +10,7 @@ Full inventory with prop schemas: /components.json
 - [Badge](/components/badge): Small pill for status, category, and counts — `default` is oxblood brand fill, `secondary` the neutral workhorse. Props: variant.
 - [Button](/components/button): Cashflow's action button — solid oxblood `primary` for the main CTA, neutral variants for the rest, tinted `destructive` for deletes. Props: variant, size.
 - [Card](/components/card): The default raised surface — white card, hairline border, light shadow, rounded-lg. Everything sits in one.
-- [Icon](/components/icon): Stroke glyph from the built-in registry — lucide-style, renders in `currentColor`, sized by the `size` prop. Props: name, size, strokeWidth, title.
+- [Icon](/components/icon): Stroke glyph from the built-in registry — lucide-style, renders in `currentColor`, sized by the `size` prop. Props: name, size, strokeWidth, brand, title.
 - [Kbd](/components/kbd): A keycap for documenting shortcuts in menus, tooltips, and command hints.
 - [Link](/components/link): An inline anchor for body copy and table cells. Defaults to the oxblood-leaning `--text-link`; underline appears on hover only. Props: muted, subtle, external.
 - [Progress](/components/progress): A determinate bar for budgets, savings goals, and import progress. Use `tone` to signal state (e.g. `danger` when a category is over budget). Props: value, tone, size, indeterminate, label, showValue.
@@ -19,9 +19,10 @@ Full inventory with prop schemas: /components.json
 - [Text](/components/text): The single typography primitive — use it for every piece of text instead of bare tags so the type scale and token colors stay consistent. `variant` sets the scale step and a default tag; `as` overrides the tag. Props: variant, as, tone, weight, mono, align.
 
 ## Data
+- [DataTable](/components/data-table): DataTable component. Props: columns, rows, getRowKey, sort, onSortChange, empty.
 - [LetterAvatar](/components/letter-avatar): LetterAvatar component. Props: text, size.
 - [StatCard](/components/stat-card): StatCard component. Props: label, value, hint, delta, metricKind.
-- [Table](/components/table): Table component. Props: maxHeight.
+- [Table](/components/table): Table component. Props: maxHeight, containerClassName.
 - [Tabs](/components/tabs): Tabs component. Props: items, value, onValueChange.
 
 ## Feedback
@@ -34,7 +35,7 @@ Full inventory with prop schemas: /components.json
 - [AmountText](/components/amount-text): The money-value primitive — use it for every currency figure instead of hand-coloring spans, so the green-in / oxblood-out convention stays consistent. Props: value, currency, locale, direction, colored, showSign.
 - [BudgetMeter](/components/budget-meter): A budget-vs-spend row for the budgets screen and category drill-downs. The bar self-colors: green under budget, amber near the limit, oxblood over. Props: label, spent, limit, currency, locale, warnAt.
 - [CategoryBreakdown](/components/category-breakdown): A card that ranks money by category as horizontal bars — the "net spend by category" tile. Props: rows, title, subtitle, trend, trendTone, max.
-- [CategoryPill](/components/category-pill): The category chip for transaction rows, filters, and budgets — icon + label with a per-category tint, drawn from a built-in icon set. Props: category, label, icon, color, interactive, size.
+- [CategoryPill](/components/category-pill): The category chip for transaction rows, filters, and budgets — icon + label with a per-category tint, drawn from a built-in icon set. Props: category, label, icon, iconName, overrides, color.
 - [ImportDropzone](/components/import-dropzone): The statement-import target for the import flow — drag-and-drop or click-to-browse a CSV/OFX file. Props: accept, onFile, hint.
 - [MoneyInput](/components/money-input): A currency amount field for adding/editing transactions and setting budgets. Pass `direction` + `onDirectionChange` to show the in/out toggle. Props: value, defaultValue, onValueChange, currency, locale, direction.
 - [PeriodSelector](/components/period-selector): The date-range control every ledger view needs — preset periods with an optional custom range, in a compact popover. Props: value, onValueChange, custom, onCustomChange, presets, size.

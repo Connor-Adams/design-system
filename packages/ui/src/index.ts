@@ -28,6 +28,15 @@ export { Spinner } from './core/Spinner'
 export type { SpinnerProps } from './core/Spinner'
 export { Text } from './core/Text'
 export type { TextProps, TextTone, TextVariant, TextWeight } from './core/Text'
+export { DataTable } from './data/DataTable'
+export type {
+  DataTableProps,
+  DataTableColumn,
+  DataTableSort,
+  DataTableSortDirection,
+  DataTableAlign,
+  DataTableComponent,
+} from './data/DataTable'
 export { LetterAvatar } from './data/LetterAvatar'
 export type { LetterAvatarProps, LetterAvatarSize } from './data/LetterAvatar'
 export { resolveDeltaTone, StatCard } from './data/StatCard'

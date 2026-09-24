@@ -1,0 +1,77 @@
+/* DataTable — the column-config layer over Table. Borders, hover tint, sticky
+   head and cell metrics all come from Table.css; this file only adds column
+   alignment, the sort control and the empty slot. Colors reach through the
+   token layer; the sort caret is drawn with borders off currentColor. */
+
+.ca-data-table [data-align='center'] {
+  text-align: center;
+}
+
+.ca-data-table [data-align='right'] {
+  text-align: right;
+}
+
+/* Sort control — a real <button>, so it is tab-reachable and responds to
+   Enter/Space for free. It inherits the head cell's micro-label type. */
+.ca-data-table-sort {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: none;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  color: inherit;
+  cursor: pointer;
+  transition: color 150ms;
+}
+
+.ca-data-table-sort:hover {
+  color: var(--foreground);
+}
+
+.ca-data-table-sort:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+/* Direction caret. Faint while the column is merely sortable, solid once it
+   is the sorted column. */
+.ca-data-table-sort::after {
+  content: '';
+  width: 0;
+  height: 0;
+  border-left: 3.5px solid transparent;
+  border-right: 3.5px solid transparent;
+  border-top: 4px solid currentColor;
+  opacity: 0.35;
+  transition: opacity 150ms, transform 150ms;
+}
+
+.ca-data-table-sort[data-direction='asc']::after {
+  opacity: 1;
+  transform: rotate(180deg);
+}
+
+.ca-data-table-sort[data-direction='desc']::after {
+  opacity: 1;
+}
+
+/* Empty slot — one cell spanning every column. */
+.ca-data-table-empty {
+  padding: 28px 12px;
+  text-align: center;
+  white-space: normal;
+  color: var(--muted-foreground);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ca-data-table-sort,
+  .ca-data-table-sort::after {
+    transition: none;
+  }
+}

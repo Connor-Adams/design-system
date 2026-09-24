@@ -92,6 +92,43 @@
     }
   ],
   "Card": [],
+  "Icon": [
+    {
+      "name": "name",
+      "type": "IconName",
+      "required": true,
+      "defaultValue": null,
+      "description": "Which glyph to render."
+    },
+    {
+      "name": "size",
+      "type": "number | undefined",
+      "required": false,
+      "defaultValue": "20",
+      "description": "Edge length in px (square). Default 20."
+    },
+    {
+      "name": "strokeWidth",
+      "type": "number | undefined",
+      "required": false,
+      "defaultValue": "2",
+      "description": "Stroke weight. Default 2."
+    },
+    {
+      "name": "brand",
+      "type": "boolean | undefined",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Render a `brand:` glyph in its official color instead of `currentColor`. No-op on stroke glyphs."
+    },
+    {
+      "name": "title",
+      "type": "string | undefined",
+      "required": false,
+      "defaultValue": null,
+      "description": "Accessible label. When set, the icon is exposed to assistive tech as an\nimage with this name; when omitted, the icon is `aria-hidden` (decorative)."
+    }
+  ],
   "Kbd": [],
   "Link": [
     {
@@ -186,7 +223,7 @@
     },
     {
       "name": "tone",
-      "type": "(string & {}) | \"primary\" | \"muted\" | \"current\" | undefined",
+      "type": "(string & {}) | \"primary\" | \"muted\" | \"current\" | \"gradient-current\" | \"gradient-primary\" | \"gradient-muted\" | \"hero\" | undefined",
       "required": false,
       "defaultValue": "current",
       "description": ""
@@ -250,6 +287,78 @@
       "description": ""
     }
   ],
+  "DataTable": [
+    {
+      "name": "columns",
+      "type": "DataTableColumn<T>[]",
+      "required": true,
+      "defaultValue": null,
+      "description": "Column definitions, left to right."
+    },
+    {
+      "name": "rows",
+      "type": "T[]",
+      "required": true,
+      "defaultValue": null,
+      "description": "The rows to render, in the order they should appear."
+    },
+    {
+      "name": "getRowKey",
+      "type": "(row: T, index: number) => Key",
+      "required": true,
+      "defaultValue": null,
+      "description": "Stable React key per row. Required on purpose: keying by array index\nsilently corrupts state when rows are sorted, filtered or paginated."
+    },
+    {
+      "name": "sort",
+      "type": "DataTableSort | null | undefined",
+      "required": false,
+      "defaultValue": null,
+      "description": "Controlled sort state, or `null`/omitted for unsorted."
+    },
+    {
+      "name": "onSortChange",
+      "type": "((sort: DataTableSort | null) => void) | undefined",
+      "required": false,
+      "defaultValue": null,
+      "description": "Called with the next sort state when a sort button is activated."
+    },
+    {
+      "name": "empty",
+      "type": "ReactNode",
+      "required": false,
+      "defaultValue": null,
+      "description": "Shown in a full-width cell when `rows` is empty and not loading."
+    },
+    {
+      "name": "loading",
+      "type": "boolean | undefined",
+      "required": false,
+      "defaultValue": null,
+      "description": "Replace the body with shimmering `Skeleton` rows."
+    },
+    {
+      "name": "loadingRows",
+      "type": "number | undefined",
+      "required": false,
+      "defaultValue": null,
+      "description": "How many skeleton rows to render while `loading`. Default 4."
+    },
+    {
+      "name": "maxHeight",
+      "type": "string | undefined",
+      "required": false,
+      "defaultValue": null,
+      "description": "Max height of the scroll region; the head stays sticky above it."
+    },
+    {
+      "name": "containerClassName",
+      "type": "string | undefined",
+      "required": false,
+      "defaultValue": null,
+      "description": "Class for the scroll container (the element `maxHeight` constrains)."
+    }
+  ],
   "LetterAvatar": [
     {
       "name": "text",
@@ -310,6 +419,13 @@
       "required": false,
       "defaultValue": null,
       "description": ""
+    },
+    {
+      "name": "containerClassName",
+      "type": "string | undefined",
+      "required": false,
+      "defaultValue": null,
+      "description": "Class for the scroll container — the element `maxHeight` constrains."
     }
   ],
   "Tabs": [
@@ -528,7 +644,7 @@
     },
     {
       "name": "weight",
-      "type": "\"regular\" | \"medium\" | \"semibold\" | \"bold\" | undefined",
+      "type": "\"bold\" | \"medium\" | \"regular\" | \"semibold\" | undefined",
       "required": false,
       "defaultValue": "bold",
       "description": ""
@@ -636,6 +752,13 @@
       "description": ""
     },
     {
+      "name": "iconOverrides",
+      "type": "CategoryOverrides | undefined",
+      "required": false,
+      "defaultValue": null,
+      "description": "App-supplied category→icon map applied to every row's pill."
+    },
+    {
       "name": "onSelect",
       "type": "((category: string, row: CategoryBreakdownRow) => void) | undefined",
       "required": false,
@@ -663,7 +786,21 @@
       "type": "ReactNode",
       "required": false,
       "defaultValue": null,
-      "description": ""
+      "description": "Raw SVG geometry to render instead of any inferred/registry glyph."
+    },
+    {
+      "name": "iconName",
+      "type": "IconName | undefined",
+      "required": false,
+      "defaultValue": null,
+      "description": "A glyph from the icon registry by name — e.g. an app's stored category icon."
+    },
+    {
+      "name": "overrides",
+      "type": "CategoryOverrides | undefined",
+      "required": false,
+      "defaultValue": null,
+      "description": "App-supplied category→icon map; wins over keyword inference."
     },
     {
       "name": "color",
@@ -1392,7 +1529,7 @@
   "Toast": [
     {
       "name": "variant",
-      "type": "\"default\" | \"success\" | \"warning\" | \"error\" | \"info\" | undefined",
+      "type": "\"default\" | \"success\" | \"info\" | \"warning\" | \"error\" | undefined",
       "required": false,
       "defaultValue": "default",
       "description": ""

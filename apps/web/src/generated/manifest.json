@@ -25,6 +25,11 @@
     "category": "core"
   },
   {
+    "slug": "icon",
+    "name": "Icon",
+    "category": "core"
+  },
+  {
     "slug": "kbd",
     "name": "Kbd",
     "category": "core"
@@ -53,6 +58,11 @@
     "slug": "text",
     "name": "Text",
     "category": "core"
+  },
+  {
+    "slug": "data-table",
+    "name": "DataTable",
+    "category": "data"
   },
   {
     "slug": "letter-avatar",

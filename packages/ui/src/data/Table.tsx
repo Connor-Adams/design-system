@@ -13,10 +13,14 @@ import './Table.css'
 
 /**
  * Bordered, scrollable data table. Compose Table > TableHeader/TableBody >
- * TableRow > TableHead/TableCell. Pass `maxHeight` for a scroll region.
+ * TableRow > TableHead/TableCell. Pass `maxHeight` for a scroll region — the
+ * head stays sticky above it. `className` styles the `<table>`;
+ * `containerClassName` styles the scroll container around it.
  */
 export interface TableProps extends React.TableHTMLAttributes<HTMLTableElement> {
   maxHeight?: string
+  /** Class for the scroll container — the element `maxHeight` constrains. */
+  containerClassName?: string
 }
 
 export interface TableRowProps extends React.HTMLAttributes<HTMLTableRowElement> {
@@ -24,11 +28,15 @@ export interface TableRowProps extends React.HTMLAttributes<HTMLTableRowElement>
 }
 
 export const Table = React.forwardRef<HTMLTableElement, TableProps>(function Table(
-  { className, style, maxHeight, children, ...props },
+  { className, style, maxHeight, containerClassName, children, ...props },
   ref,
 ): React.JSX.Element {
   return (
-    <div data-slot="table-container" className="ca-table-container" style={maxHeight ? { maxHeight } : undefined}>
+    <div
+      data-slot="table-container"
+      className={containerClassName ? `ca-table-container ${containerClassName}` : 'ca-table-container'}
+      style={maxHeight ? { maxHeight } : undefined}
+    >
       <table
         ref={ref}
         data-slot="table"
