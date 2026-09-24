@@ -14,3 +14,5 @@ A segmented control for switching between a few mutually-exclusive views (timefr
 ```
 
 Variants: `type="single" | "multiple"`, `size="sm | default"`, optional per-item `icon`.
+
+Labelling: each segment is its own focusable button, so the `role="group"` root is not labelable — name it with `aria-labelledby` / `aria-label` rather than a `<label htmlFor>`, which would associate with nothing. Inside a `Field` this is handled for you.

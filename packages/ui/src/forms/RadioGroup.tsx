@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { markFieldShape } from './fieldProps'
 import './RadioGroup.css'
 
 export type RadioOption = string | { value: string; label: string }
@@ -73,3 +74,8 @@ export const RadioGroup = React.forwardRef<HTMLDivElement, RadioGroupProps>(func
     </div>
   )
 })
+
+// Group-shaped: every option is its own focusable radio, so the `role="radiogroup"`
+// root is not labelable. `Field` names it with `aria-labelledby` instead of
+// pointing `htmlFor` at a container that associates with nothing.
+markFieldShape(RadioGroup, 'group')

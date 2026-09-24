@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { markFieldShape } from './fieldProps'
 import './ToggleGroup.css'
 
 export interface ToggleItem {
@@ -77,3 +78,7 @@ export const ToggleGroup = React.forwardRef<HTMLDivElement, ToggleGroupProps>(fu
     </div>
   )
 })
+
+// Group-shaped: each segment is its own focusable button, so the `role="group"`
+// root is not labelable. `Field` names it with `aria-labelledby` instead.
+markFieldShape(ToggleGroup, 'group')
