@@ -45,6 +45,58 @@
   textarea {
     font: inherit;
   }
+
+  /* Scrollbars — the one piece of chrome the browser still paints light under a
+     dark theme, which is why every consumer has been hand-patching it. Both
+     properties inherit, so declaring them once on :root covers the viewport bar
+     and every scroll container under it; any element can opt back out with
+     `scrollbar-width: auto`.
+
+     Deliberately `thin`, not a length: `scrollbar-width` takes a keyword, and
+     `none` would remove the affordance. Nothing here touches scrollbar-gutter —
+     turning that on globally would shift every layout. */
+  :root {
+    scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+    scrollbar-width: thin;
+  }
+
+  /* FALLBACK ONLY — Safari < 18.2 and Chromium < 121, which have no
+     `scrollbar-color`. The @supports gate is load-bearing rather than cosmetic:
+     where both are understood, Chromium gives the -webkit- pseudo-elements
+     precedence over the standard properties, so an ungated block would quietly
+     make this the real implementation everywhere instead of the fallback. */
+  @supports not (scrollbar-color: auto) {
+    ::-webkit-scrollbar {
+      width: var(--scrollbar-size);
+      height: var(--scrollbar-size);
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--scrollbar-track);
+    }
+
+    /* Transparent border + content-box clip insets the thumb: it reads as a
+       ~6px pill while the drag target stays the full --scrollbar-size. */
+    ::-webkit-scrollbar-thumb {
+      background: var(--scrollbar-thumb);
+      background-clip: content-box;
+      border: 2px solid transparent;
+      border-radius: var(--radius-full);
+    }
+
+    ::-webkit-scrollbar-thumb:hover,
+    ::-webkit-scrollbar-thumb:active {
+      background: var(--scrollbar-thumb-hover);
+      background-clip: content-box;
+    }
+
+    /* The one corner concession: left alone it stays white in dark mode. Colour
+       only — no sizing, and ::-webkit-scrollbar-button is untouched so the
+       platform keeps whatever arrows it draws. */
+    ::-webkit-scrollbar-corner {
+      background: var(--scrollbar-track);
+    }
+  }
 }
 
 /* Skeleton shimmer — 1.6s hero-gradient sweep at ~22% over the muted base */
@@ -69,4 +121,24 @@
 
 @media (prefers-reduced-motion: reduce) {
   .skeleton-shimmer { background-image: none; animation: none; }
+}
+
+/* Scroll-chrome opt-out. Unlayered on purpose, exactly like .skeleton-shimmer
+   above: a utility has to beat the @layer base rules it overrides (and the
+   @layer components CSS), and unlayered declarations outrank every layer. `Tabs` wants it for horizontal pill overflow; the Rainbot dashboard
+   hand-rolls the same thing today.
+
+   ACCESSIBILITY: this hides the bar, it does NOT stop the region scrolling —
+   wheel, trackpad and keyboard still work. But a scroll container is only
+   keyboard-reachable if something in it is focusable, and with the bar hidden
+   there is no visible cue that content continues. So put `tabindex="0"` and an
+   accessible name on the container, and keep some other affordance (a fade, an
+   arrow). If in doubt, don't hide the bar. */
+.ca-no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none; /* legacy Edge/IE */
+}
+
+.ca-no-scrollbar::-webkit-scrollbar {
+  display: none;
 }

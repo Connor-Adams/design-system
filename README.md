@@ -170,6 +170,7 @@ re-point any of them. This is the whole knob surface:
 | Group | File | Tokens |
 | --- | --- | --- |
 | Semantic colors | `semantic.css` | surfaces, text, `--primary*`, `--secondary*`, `--accent*`, `--text-link*`, signals (`--success*`/`--warning*`/`--danger*`/`--info*`), money (`--positive*`/`--negative*`), `--destructive*`, `--border`, `--input`, `--ring` — 55 in total, defined per theme |
+| Scrollbars | `semantic.css` | `--scrollbar-track`, `--scrollbar-thumb`, `--scrollbar-thumb-hover`, `--scrollbar-size` — defined per theme; see *Scrollbars* below |
 | Chart palette | `semantic.css` | `--chart-1..5`, `--chart-line-1..6`, plus the domain aliases `--chart-spend`/`-credit`/`-payment`/`-business`/`-personal` |
 | Raw ramps | `colors.css` | the oxblood/zinc/green/amber/alert scales, `--chart-steel`, and `--gradient-hero`/`-from`/`-to` |
 | Radius | `spacing.css` | `--radius`, `--radius-sm/md/lg/xl/full` |
@@ -192,6 +193,49 @@ and reasoning about what it "would" do is wasted effort.
 
 If a brand does diverge on what a name means, say so in a comment in the brand
 file.
+
+### Scrollbars
+
+Scrollbars used to be the one piece of chrome the token layer could not reach —
+browser-default, and therefore stubbornly light under a dark theme, which is why
+consumers kept hand-writing `::-webkit-scrollbar` rules against raw hex. They are
+tokenised now, and `base.css` applies them globally.
+
+| Token | Derivation | Why |
+| --- | --- | --- |
+| `--scrollbar-track` | `var(--muted)` | the quiet surface the bar sits on |
+| `--scrollbar-thumb` | `color-mix(in oklch, var(--muted-foreground) 35%, var(--border))` | the hairline nudged toward text — findable, not chrome you look at |
+| `--scrollbar-thumb-hover` | same mix at 70% | hover **and** `:active` |
+| `--scrollbar-size` | `10px` | webkit fallback only (see below) |
+
+Nothing new enters the palette: all three colours are mixes of tokens a brand or
+app already controls, so **a brand gets sensible scrollbars for free** —
+`brands/rainbot.css` does not name a single scrollbar token and still inherits
+correct dark chrome, because it leaves `--border`/`--muted`/`--muted-foreground`
+to the dark theme.
+
+The base styling is standards-first: `scrollbar-color` + `scrollbar-width: thin`
+on `:root`, which both inherit, so one declaration covers the viewport bar and
+every scroll container. A `::-webkit-scrollbar` block follows for Safari < 18.2
+and Chromium < 121, **gated behind `@supports not (scrollbar-color: auto)`** —
+without the gate, Chromium would prefer the `-webkit-` pseudo-elements and the
+fallback would silently become the real implementation. `scrollbar-gutter` is
+deliberately untouched (enabling it globally shifts layout), and
+`::-webkit-scrollbar-button` is left to the platform.
+
+To override, re-point a token, or beat the base layer outright:
+
+```css
+:root { --scrollbar-thumb: var(--primary); }          /* brand the thumb */
+.my-panel { scrollbar-width: auto; }                  /* full-width bar back */
+```
+
+**`.ca-no-scrollbar`** hides the scroll chrome (unlayered, so it wins over the
+base layer). It does *not* disable scrolling — wheel, trackpad and keyboard still
+work — but with no visible bar there is no cue that content continues, and a
+scroll container is only keyboard-reachable when something in it is focusable.
+Pair it with `tabindex="0"` plus an accessible name on the container, and keep
+another affordance (edge fade, arrow). Prefer keeping the bar.
 
 ### Known limits
 
@@ -240,7 +284,7 @@ fix is a separate token for the gradient stop.
 - `tokens/semantic.css` — semantic aliases, light + dark
 - `tokens/typography.css` — font families + type scale
 - `tokens/spacing.css` — radius, spacing ladder, layout, shadow
-- `tokens/fonts.css` — webfont imports · `tokens/base.css` — element resets + shimmer
+- `tokens/fonts.css` — webfont imports · `tokens/base.css` — element resets + scrollbars + shimmer
 
 **Components** (`window.CashflowDesignSystem_2cf89d.<Name>` after loading `_ds_bundle.js`)
 - `components/core/` — Button, Badge, Card (+ Header/Title/Description/Content), Text, Link, Separator, Spinner, Kbd, Avatar, Progress, Accordion
