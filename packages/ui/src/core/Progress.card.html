@@ -1,4 +1,4 @@
-<!-- @dsCard group="Components" viewport="700x230" name="Progress" subtitle="Determinate + indeterminate bars, semantic tones" -->
+<!-- @dsCard group="Components" viewport="700x430" name="Progress" subtitle="Determinate, indeterminate, and stacked bars with free-form readouts" -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -28,6 +28,25 @@
         <Progress value={68} label="Groceries budget" showValue />
         <Progress value={104} tone="danger" label="Dining (over)" showValue />
         <Progress value={45} tone="success" size="lg" label="Savings goal" showValue />
+        <Progress value={28} label="Now playing" valueText="1:23 / 4:56" />
+        <Progress value={43} tone="success" label="Statements imported" valueText="3 of 7" />
+        <Progress
+          label="Pauses & resumes"
+          valueText="12 paused / 9 resumed"
+          segments={[
+            { value: 57, tone: 'danger', label: 'Pauses' },
+            { value: 43, tone: 'primary', label: 'Resumes' },
+          ]}
+        />
+        <Progress
+          size="lg"
+          label="Disk by kind"
+          valueText="820 MB / 2 GB"
+          segments={[
+            { value: 24, tone: 'primary', label: 'Media' },
+            { value: 17, tone: 'warning', label: 'Statements' },
+          ]}
+        />
         <Progress indeterminate label="Importing statement…" />
       </div>
     );

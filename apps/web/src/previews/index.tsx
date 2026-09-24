@@ -418,6 +418,34 @@ export const previews: Record<string, Variant[]> = {
         <Progress value={100} tone="success" />
       </div>
     )},
+    { label: 'Readouts', node: (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 280 }}>
+        <Progress value={28} label="Now playing" valueText="1:23 / 4:56" />
+        <Progress value={43} tone="success" label="Statements imported" valueText="3 of 7" />
+        <Progress value={41} size="lg" label="Upload" valueText="820 MB / 2 GB" />
+      </div>
+    )},
+    { label: 'Segmented', node: (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 280 }}>
+        <Progress
+          label="Pauses & resumes"
+          valueText="12 paused / 9 resumed"
+          segments={[
+            { value: 57, tone: 'danger', label: 'Pauses' },
+            { value: 43, tone: 'primary', label: 'Resumes' },
+          ]}
+        />
+        <Progress
+          size="lg"
+          label="Disk by kind"
+          valueText="50% of 2 GB"
+          segments={[
+            { value: 30, tone: 'primary', label: 'Media' },
+            { value: 20, tone: 'warning', label: 'Statements' },
+          ]}
+        />
+      </div>
+    )},
   ],
 
   separator: [
