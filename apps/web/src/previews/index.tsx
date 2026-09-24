@@ -36,6 +36,7 @@ import {
   // forms
   Checkbox,
   Combobox,
+  Field,
   Input,
   Label,
   NativeSelect,
@@ -85,6 +86,24 @@ function PaginationPreview(): React.JSX.Element {
   const [page, setPage] = React.useState(3)
   return <Pagination page={page} pageCount={10} onPageChange={setPage} siblingCount={1} />
 }
+
+// ---------------------------------------------------------------------------
+// Adornment glyphs — Input takes icons as nodes, so the gallery supplies its own
+// ---------------------------------------------------------------------------
+
+const SearchGlyph = (
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
+    <circle cx="11" cy="11" r="7" />
+    <path d="m21 21-4.3-4.3" />
+  </svg>
+)
+
+const LockGlyph = (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
+    <rect x="4" y="11" width="16" height="10" rx="2" />
+    <path d="M8 11V7a4 4 0 0 1 8 0v4" />
+  </svg>
+)
 
 // ---------------------------------------------------------------------------
 // Variant type
@@ -512,12 +531,52 @@ export const previews: Record<string, Variant[]> = {
     )},
   ],
 
+  field: [
+    { label: 'Label + hint', node: (
+      <div style={{ maxWidth: 300 }}>
+        <Field label="Merchant" hint="As it appears on the statement.">
+          <Input placeholder="Whole Foods Market" />
+        </Field>
+      </div>
+    )},
+    { label: 'Error (replaces the hint)', node: (
+      <div style={{ maxWidth: 300 }}>
+        <Field label="Merchant" hint="As it appears on the statement." error="Merchant is required.">
+          <Input defaultValue="" />
+        </Field>
+      </div>
+    )},
+    { label: 'Required + any control', node: (
+      <div style={{ display: 'grid', gap: 14, maxWidth: 300 }}>
+        <Field label="Account name" required hint="Shown throughout the app.">
+          <Input placeholder="Amex Cobalt" />
+        </Field>
+        <Field label="Currency" required>
+          <NativeSelect options={['CAD', 'USD', 'EUR', 'GBP']} />
+        </Field>
+        <Field label="Note" error="Note is too long.">
+          <Textarea placeholder="Add a note…" />
+        </Field>
+        <Field label="Auto-reconcile" hint="Match imported rows automatically.">
+          <Switch defaultChecked />
+        </Field>
+      </div>
+    )},
+  ],
+
   input: [
     { label: 'States', node: (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10, maxWidth: 280 }}>
         <Input placeholder="Enter a value…" />
         <Input defaultValue="Hello, world" />
         <Input invalid defaultValue="bad input" />
+      </div>
+    )},
+    { label: 'Adornments', node: (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 10, maxWidth: 280 }}>
+        <Input leadingIcon={SearchGlyph} placeholder="Search transactions…" />
+        <Input leadingIcon={SearchGlyph} clearable clearLabel="Clear search" defaultValue="whole foods" />
+        <Input trailingIcon={LockGlyph} defaultValue="••••••" />
       </div>
     )},
   ],

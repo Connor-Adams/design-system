@@ -1,0 +1,36 @@
+/* Field — the label + control + message stack. No interactive states of its
+   own (the control owns its focus ring); nothing animates, so no
+   prefers-reduced-motion block is needed. All colors reach through the semantic
+   token layer; no raw hex. */
+
+.ca-field {
+  display: grid;
+  gap: 6px;
+  font-family: var(--font-sans);
+}
+
+/* Label is composed, not duplicated: it defaults to a stacking grid for the
+   wrap-the-control idiom, which here has to sit inline with the required mark.
+   Both classes are matched so this wins regardless of CSS bundle order. */
+.ca-label.ca-field-label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.ca-field-required {
+  color: var(--destructive);
+  font-weight: var(--weight-semibold);
+  line-height: 1;
+}
+
+.ca-field-message {
+  margin: 0;
+  font-size: var(--text-body-sm);
+  line-height: var(--text-body-sm-lh);
+  color: var(--muted-foreground);
+}
+
+.ca-field-message--error {
+  color: var(--destructive);
+}
