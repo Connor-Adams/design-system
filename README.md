@@ -83,8 +83,8 @@ How Cashflow writes copy:
 - **Dark mode** is the *same* token layer re-pointed via `[data-theme="dark"]` —
   never a separate stylesheet.
 - **Brands** are a second, orthogonal axis, re-pointed via `[data-brand="…"]`.
-  Cashflow is the unnamed default on `:root`; a named brand overlays it. See
-  *Brands* below.
+  Cashflow is the unnamed default on `:root`; a named brand overlays it as a
+  delta. See *Customization* below.
 - **Type:** geometric-humanist sans (Avenir Next in the app; **substituted with
   Mulish** here — see Caveats). Tight negative tracking on display/headline sizes;
   body default 14px; uppercase letter-spaced micro-labels; mono/tabular figures
@@ -92,25 +92,21 @@ How Cashflow writes copy:
 
 ---
 
-## Brands
+## Customization
 
 Theming has two independent axes. `[data-theme]` swaps light/dark. `[data-brand]`
-swaps the *palette* the semantic layer points at. Components only ever read
-semantic names (`--primary`, `--card`, `--border`), so a brand needs no component
-changes and no fork of the system.
+swaps the *palette and feel* that the semantic layer resolves to. Components only
+ever read semantic names (`--primary`, `--card`, `--radius-lg`, `--font-sans`), so
+neither axis requires touching a component.
 
-Cashflow is the unnamed default, defined directly on `:root` in
-`packages/tokens/src/semantic.css`. Additional brands live in
-`packages/tokens/src/brands/<name>.css` and are **opt-in imports** — a Cashflow
-consumer never ships another brand's bytes.
+Cashflow is the unnamed default, defined directly on `:root`. Additional brands
+live in `packages/tokens/src/brands/<name>.css` and are **opt-in imports** — a
+Cashflow consumer never ships another brand's bytes.
 
 | Brand | Scope | Import |
 | --- | --- | --- |
 | Cashflow | `:root` (default) | included in `@connor-adams/tokens/styles.css` |
 | Rainbot | `:root[data-brand="rainbot"]` | `@connor-adams/tokens/brands/rainbot.css` |
-
-To adopt a brand, import it **after** the base stylesheet and set the attribute
-on `<html>`:
 
 ```css
 @import "@connor-adams/tokens/styles.css";
@@ -123,25 +119,53 @@ on `<html>`:
 
 **Import order is load-bearing.** A brand selector (`:root[data-brand="x"]`) has
 the same specificity as a theme selector (`:root[data-theme="dark"]`), so it wins
-on source order alone. Importing a brand before the base stylesheet silently does
-nothing.
+on source order alone. Importing a brand *before* the base stylesheet silently
+does nothing.
 
-### Writing a new brand
+Note that token files are deliberately **unlayered** (only the element resets in
+`base.css` sit in `@layer base`, and component CSS in `@layer components`). Do not
+wrap the token layer in a cascade layer: unlayered declarations beat every layer,
+so layering `semantic.css` while `colors.css` stays unlayered would stop a brand
+from overriding the raw ramps or the gradient.
 
-- Define private primitives under a short prefix (`--rb-*` for Rainbot) so they
-  cannot collide with the shared ramps in `colors.css`.
-- Redefine the **complete** semantic surface, not just the deltas. A token left
-  unset falls through to whichever Cashflow theme block is active and renders in
-  Cashflow's palette — a leak that is easy to miss and hard to trace.
-- That includes the money semantics (`--positive`, `--negative`) and the
-  domain-named chart aliases (`--chart-spend`, `--chart-credit`, …) even for a
-  brand with no money. Map them to something neutral in your palette; leaving
-  them unset means oxblood.
-- Set `color-scheme` so native form controls and scrollbars match.
-- A brand may deliberately diverge on what a semantic name *means* — Rainbot uses
-  `--secondary` as a saturated brand hue where Cashflow uses it as a quiet
-  neutral chip surface. Say so in a comment; it changes how shared components
-  render under that brand.
+### A brand is a delta, not a fork
+
+Anything a brand does not name falls through to the active theme block. So a
+brand overriding five tokens is a five-declaration file — see
+`brands/rainbot.css`, which is ~20 declarations for a completely different look.
+There is no requirement to restate the token layer.
+
+The one thing to be deliberate about: a brand written against dark surfaces
+expects `data-theme="dark"` to be set too. Pair the attributes.
+
+### What you can override
+
+Every token below lives on a plain `:root` selector, so a brand (or an app) can
+re-point any of them. This is the whole knob surface:
+
+| Group | File | Tokens |
+| --- | --- | --- |
+| Semantic colors | `semantic.css` | surfaces, text, `--primary*`, `--secondary*`, `--accent*`, `--text-link*`, signals (`--success*`/`--warning*`/`--danger*`/`--info*`), money (`--positive*`/`--negative*`), `--destructive*`, `--border`, `--input`, `--ring` — 55 in total, defined per theme |
+| Chart palette | `semantic.css` | `--chart-1..5`, `--chart-line-1..6`, plus the domain aliases `--chart-spend`/`-credit`/`-payment`/`-business`/`-personal` |
+| Raw ramps | `colors.css` | the oxblood/zinc/green/amber/alert scales, `--chart-steel`, and `--gradient-hero`/`-from`/`-to` |
+| Radius | `spacing.css` | `--radius`, `--radius-sm/md/lg/xl/full` |
+| Spacing | `spacing.css` | `--space-0.5` … `--space-8` |
+| Layout | `spacing.css` | `--sidebar-width`, `--content-max`, `--content-max-wide`, `--content-max-ultrawide`, `--breakpoint-3xl` |
+| Elevation | `spacing.css` | `--shadow` (light and dark variants) |
+| Type | `typography.css` | `--font-sans`, `--font-mono`, `--leading-base`, `--weight-regular/medium/semibold/bold`, the full `--text-*` scale with its `-lh`/`-ls` pairs, `--text-label` |
+
+Semantic names carry meaning, not just a value. `--secondary` is a quiet neutral
+chip surface, not "the second brand hue" — re-pointing it at a saturated colour
+makes every `<Button variant="secondary">` loud. Use `--accent` for a second hue.
+If a brand does diverge on what a name means, say so in a comment in the brand
+file.
+
+### Known limits
+
+Some components hard-code values a brand cannot reach. These are bugs, not
+design: `Card`'s `padding: 20px` (`Card.css`), `Progress`'s `4/8/12px` size
+ramp, `Sparkline`'s fixed pixel dimensions, and `CategoryBreakdown`'s inlined
+`BAR_GRADIENT` constant. Prefer a token or a prop when you touch them.
 
 ---
 

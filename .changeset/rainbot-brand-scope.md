@@ -2,17 +2,20 @@
 '@connor-adams/tokens': minor
 ---
 
-Add a brand axis to the token layer, and Rainbot as its first named brand.
+Add a brand axis to the token layer, with Rainbot as the first named brand.
 
-Theming previously had one axis (`[data-theme]` light/dark) with Cashflow's
-palette baked into `:root`, so a second product could only override the semantic
-layer by specificity from inside its own app. Brands are now a second,
-orthogonal axis: `packages/tokens/src/brands/<name>.css` scoped to
-`:root[data-brand="<name>"]`, exported as `@connor-adams/tokens/brands/<name>.css`
-and opt-in, so a Cashflow consumer ships none of another brand's bytes.
+Theming had one axis — `[data-theme]` light/dark — with Cashflow's palette baked
+into `:root`, so a second product could only restyle the system by overriding
+the semantic layer from inside its own app. Brands are now a second, orthogonal
+axis: `packages/tokens/src/brands/<name>.css`, scoped to
+`:root[data-brand="<name>"]`, exported as
+`@connor-adams/tokens/brands/<name>.css` and opt-in, so a Cashflow consumer
+ships none of another brand's bytes.
 
-Adds `brands/rainbot.css` — a dark-only brand on a blue/violet/pink triad. It
-redefines the complete semantic surface (all 55 tokens) rather than only the
-deltas, so no token falls through to Cashflow's palette. Note it deliberately
-diverges on `--secondary`, which is a saturated violet brand hue under Rainbot
-where Cashflow uses a quiet neutral chip surface.
+A brand is a delta, not a fork — anything it does not name falls through to the
+active theme block. `brands/rainbot.css` is ~20 declarations for a completely
+different look (blue/violet/pink triad, its own gradient and chart ramp).
+
+Also documents the full override surface in the README: every token group a
+brand or an app may re-point, why the token layer must stay unlayered, and the
+components that still hard-code values a brand cannot reach.
