@@ -1,4 +1,4 @@
-<!-- @dsCard group="Components" viewport="700x300" name="Core — Button, Badge, Card" subtitle="Oxblood primary, neutral variants, brand pills" -->
+<!-- @dsCard group="Components" viewport="700x980" name="Core — Button, Badge, Card" subtitle="Oxblood primary, neutral variants, brand pills, configurable card surfaces" -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -51,13 +51,72 @@
             <Badge variant="count">12</Badge>
           </div>
         </div>
-        <Card style={{ maxWidth: 320 }}>
-          <CardHeader>
-            <CardTitle>Net worth</CardTitle>
-            <CardDescription>Across all accounts · CAD</CardDescription>
-          </CardHeader>
-          <CardContent style={{ fontSize: '1.55rem', fontWeight: 700, letterSpacing: '-0.01em' }}>$128,400</CardContent>
-        </Card>
+        <div>
+          <p className="cap">Card — default (no props)</p>
+          <Card style={{ maxWidth: 320 }}>
+            <CardHeader>
+              <CardTitle>Net worth</CardTitle>
+              <CardDescription>Across all accounts · CAD</CardDescription>
+            </CardHeader>
+            <CardContent style={{ fontSize: '1.55rem', fontWeight: 700, letterSpacing: '-0.01em' }}>$128,400</CardContent>
+          </Card>
+        </div>
+
+        <div>
+          <p className="cap">Card — header actions (title leads, actions trail)</p>
+          <Card style={{ maxWidth: 440 }}>
+            <CardHeader actions={<Button size="sm" variant="secondary">Export</Button>}>
+              <CardTitle>Spending by category</CardTitle>
+              <CardDescription>June 2025 · CAD</CardDescription>
+            </CardHeader>
+            <CardContent>$3,240.00 across 8 categories</CardContent>
+          </Card>
+        </div>
+
+        <div>
+          <p className="cap">Card — variant × padding</p>
+          {['default', 'nested', 'plain'].map((variant) => (
+            <div key={variant} className="row" style={{ alignItems: 'stretch', marginBottom: 10 }}>
+              {['none', 'sm', 'default', 'lg'].map((padding) => (
+                <Card key={padding} variant={variant} padding={padding} style={{ minWidth: 138 }}>
+                  <CardTitle style={{ fontSize: 'var(--text-body)' }}>{variant}</CardTitle>
+                  <CardDescription>padding={padding}</CardDescription>
+                </Card>
+              ))}
+            </div>
+          ))}
+        </div>
+
+        <div>
+          <p className="cap">Card — radius (orthogonal to variant)</p>
+          <div className="row">
+            {['md', 'lg', 'xl'].map((radius) => (
+              <Card key={radius} radius={radius} style={{ minWidth: 138 }}>
+                <CardTitle style={{ fontSize: 'var(--text-body)' }}>radius={radius}</CardTitle>
+              </Card>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <p className="cap">Card — nested composition (no stacked shadow)</p>
+          <Card padding="lg" radius="xl" style={{ maxWidth: 440 }}>
+            <CardHeader actions={<Button size="sm" variant="ghost">Edit</Button>}>
+              <CardTitle>Accounts</CardTitle>
+              <CardDescription>Two connected, one needs attention</CardDescription>
+            </CardHeader>
+            <CardContent style={{ display: 'grid', gap: 12 }}>
+              <Card variant="nested" padding="sm" radius="xl">
+                <CardTitle style={{ fontSize: 'var(--text-body)' }}>Chequing · 4021</CardTitle>
+                <CardDescription>Synced 6 minutes ago</CardDescription>
+              </Card>
+              <Card variant="nested" padding="sm" radius="xl">
+                <CardTitle style={{ fontSize: 'var(--text-body)' }}>Visa · 8842</CardTitle>
+                <CardDescription>Re-authentication required</CardDescription>
+              </Card>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     );
   }

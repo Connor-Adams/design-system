@@ -158,7 +158,7 @@ export const previews: Record<string, Variant[]> = {
   ],
 
   card: [
-    { label: 'Example', node: (
+    { label: 'Default (no props)', node: (
       <Card style={{ maxWidth: 360 }}>
         <CardHeader>
           <CardTitle>Monthly Summary</CardTitle>
@@ -170,6 +170,99 @@ export const previews: Record<string, Variant[]> = {
           </p>
         </CardContent>
       </Card>
+    )},
+    { label: 'Header actions', node: (
+      <div style={{ display: 'grid', gap: 16, maxWidth: 460 }}>
+        <Card>
+          <CardHeader actions={<Button size="sm" variant="secondary">Export</Button>}>
+            <CardTitle>Spending by category</CardTitle>
+            <CardDescription>June 2025 · CAD</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p style={{ margin: 0, color: 'var(--muted-foreground)', fontSize: 'var(--text-body)' }}>
+              $3,240.00 across 8 categories
+            </p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader
+            actions={
+              <>
+                <Button size="sm" variant="ghost">Month</Button>
+                <Button size="sm" variant="secondary">Year</Button>
+              </>
+            }
+          >
+            <CardTitle>Cash flow</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p style={{ margin: 0, color: 'var(--muted-foreground)', fontSize: 'var(--text-body)' }}>
+              Title-only header, two actions.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    )},
+    { label: 'Variant × padding', node: (
+      <div style={{ display: 'grid', gap: 20 }}>
+        {(['default', 'nested', 'plain'] as const).map((variant) => (
+          <div key={variant}>
+            <p style={{ margin: '0 0 8px', fontSize: 'var(--text-label)', textTransform: 'uppercase', letterSpacing: '.06em', fontWeight: 600, color: 'var(--muted-foreground)' }}>
+              {variant}
+            </p>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, alignItems: 'stretch' }}>
+              {(['none', 'sm', 'default', 'lg'] as const).map((padding) => (
+                <Card key={padding} variant={variant} padding={padding} style={{ minWidth: 148 }}>
+                  <CardTitle style={{ fontSize: 'var(--text-body)' }}>{variant}</CardTitle>
+                  <CardDescription>padding={padding}</CardDescription>
+                </Card>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    )},
+    { label: 'Radius', node: (
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}>
+        {(['md', 'lg', 'xl'] as const).map((radius) => (
+          <Card key={radius} radius={radius} style={{ minWidth: 148 }}>
+            <CardTitle style={{ fontSize: 'var(--text-body)' }}>radius={radius}</CardTitle>
+          </Card>
+        ))}
+      </div>
+    )},
+    { label: 'Nested composition', node: (
+      <Card padding="lg" radius="xl" style={{ maxWidth: 460 }}>
+        <CardHeader actions={<Button size="sm" variant="ghost">Edit</Button>}>
+          <CardTitle>Accounts</CardTitle>
+          <CardDescription>Two connected, one needs attention.</CardDescription>
+        </CardHeader>
+        <CardContent style={{ display: 'grid', gap: 12 }}>
+          <Card variant="nested" padding="sm" radius="xl">
+            <CardTitle style={{ fontSize: 'var(--text-body)' }}>Chequing · 4021</CardTitle>
+            <CardDescription>Synced 6 minutes ago</CardDescription>
+          </Card>
+          <Card variant="nested" padding="sm" radius="xl">
+            <CardTitle style={{ fontSize: 'var(--text-body)' }}>Visa · 8842</CardTitle>
+            <CardDescription>Re-authentication required</CardDescription>
+          </Card>
+        </CardContent>
+      </Card>
+    )},
+    { label: 'Plain (consumer frame)', node: (
+      <div style={{ border: '1px dashed var(--input)', borderRadius: 'var(--radius-xl)', maxWidth: 400 }}>
+        <Card variant="plain">
+          <CardHeader actions={<Button size="sm" variant="ghost">Refresh</Button>}>
+            <CardTitle>Consumer-supplied frame</CardTitle>
+            <CardDescription>No border, no shadow, no fill.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p style={{ margin: 0, color: 'var(--muted-foreground)', fontSize: 'var(--text-body)' }}>
+              The dashed outline is the consumer&apos;s, not the card&apos;s.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
     )},
   ],
 

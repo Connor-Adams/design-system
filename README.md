@@ -163,9 +163,18 @@ file.
 ### Known limits
 
 Some components hard-code values a brand cannot reach. These are bugs, not
-design: `Card`'s `padding: 20px` (`Card.css`), `Progress`'s `4/8/12px` size
-ramp, `Sparkline`'s fixed pixel dimensions, and `CategoryBreakdown`'s inlined
-`BAR_GRADIENT` constant. Prefer a token or a prop when you touch them.
+design: `Progress`'s `4/8/12px` size ramp, `Sparkline`'s fixed pixel dimensions,
+and `CategoryBreakdown`'s inlined `BAR_GRADIENT` constant. Prefer a token or a
+prop when you touch them.
+
+`Card`'s padding **used** to be on this list as a hard-coded `20px`. It is now
+`var(--ca-card-padding)`, defaulting to `--space-5` (the token spelling of the
+same 20px) and switchable with `padding="none|sm|default|lg"` — plus
+`variant="default|nested|plain"` and `radius="md|lg|xl"`, all resolved off the
+token layer via `data-*` attributes. One gap remains: the radius ladder stops at
+`--radius-xl` (12px), so the `rounded-2xl` (16px) page panel some apps hand-roll
+still has no token to reach for — add `--radius-2xl` to `spacing.css` if you
+need it.
 
 ---
 
