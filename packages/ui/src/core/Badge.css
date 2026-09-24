@@ -1,5 +1,6 @@
-/* Badge — a small status / count pill. Variants are keyed off data-variant.
-   All colors reach through the semantic token layer; no raw hex. */
+/* Badge — a small status / count pill. Variants are keyed off data-variant,
+   the type/padding scale off data-size. All colors reach through the semantic
+   token layer; no raw hex. */
 
 .ca-badge {
   display: inline-flex;
@@ -9,12 +10,30 @@
   justify-content: center;
   gap: 4px;
   border-radius: var(--radius-md);
-  padding: 2px 8px;
   font-size: var(--text-body-sm);
   font-weight: var(--weight-medium);
   font-family: var(--font-sans);
   line-height: 1.25;
   white-space: nowrap;
+}
+
+/* Badges are not focusable by default, but consumers do hang tabIndex/role on
+   them (filter chips, removable tags). Keep the ring ready. */
+.ca-badge:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+/* ---- Sizes ---- */
+.ca-badge[data-size='default'] {
+  padding: 2px 8px;
+}
+
+.ca-badge[data-size='sm'] {
+  padding: 0 6px;
+  font-size: var(--text-label);
+  line-height: 1.2;
+  gap: 3px;
 }
 
 /* ---- Variants ---- */
@@ -48,12 +67,121 @@
   border: 1px solid transparent;
 }
 
+.ca-badge[data-variant='warning'] {
+  background: var(--warning-bg);
+  color: var(--warning-foreground);
+  border: 1px solid transparent;
+}
+
+.ca-badge[data-variant='info'] {
+  background: var(--info-bg);
+  color: var(--info-foreground);
+  border: 1px solid transparent;
+}
+
 .ca-badge[data-variant='count'] {
   background: var(--muted);
   color: var(--muted-foreground);
   border: 1px solid var(--border);
   text-transform: uppercase;
   font-weight: var(--weight-bold);
-  font-size: 0.68rem;
+}
+
+/* `count` carries its own bespoke scale, so it opts out of the shared size
+   ramp and re-expresses both steps itself. Two attribute selectors beat the
+   one-attribute size rules above regardless of source order, which is what
+   keeps the historical `variant="count"` pill pixel-identical. */
+.ca-badge[data-variant='count'][data-size='default'] {
   padding: 4px 10px;
+  font-size: 0.68rem;
+}
+
+.ca-badge[data-variant='count'][data-size='sm'] {
+  padding: 1px 7px;
+  font-size: 0.6rem;
+  line-height: 1.25;
+}
+
+/* ---- Status dot ----
+   A real element rather than a consumer-supplied child, so the tint tracks the
+   variant automatically. Decorative (aria-hidden in the .tsx) — the label
+   carries the meaning. */
+.ca-badge__dot {
+  position: relative;
+  flex-shrink: 0;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.ca-badge[data-size='sm'] .ca-badge__dot {
+  width: 5px;
+  height: 5px;
+}
+
+/* Tints: on the filled variants currentColor already reads as the status
+   color, so only the neutral and tinted-background variants need steering. */
+.ca-badge[data-variant='secondary'] .ca-badge__dot,
+.ca-badge[data-variant='outline'] .ca-badge__dot {
+  background: var(--muted-foreground);
+}
+
+.ca-badge[data-variant='success'] .ca-badge__dot {
+  background: var(--success);
+}
+
+.ca-badge[data-variant='warning'] .ca-badge__dot {
+  background: var(--warning);
+}
+
+.ca-badge[data-variant='info'] .ca-badge__dot {
+  background: var(--info);
+}
+
+.ca-badge[data-variant='count'] .ca-badge__dot {
+  width: 5px;
+  height: 5px;
+  background: var(--muted-foreground);
+}
+
+/* ---- Pulse ----
+   A halo that expands out of the dot and fades — the "live" tell. The loop is
+   scoped to the 6px dot, never to the label, so it stays a status affordance
+   rather than decorative motion on content. 1.6s matches the system's existing
+   slow-ambient cadence (the skeleton shimmer) instead of inventing a new one;
+   ease-out, no bounce, no scale on the dot itself. */
+.ca-badge__dot[data-pulse='true']::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: inherit;
+  animation: ca-badge-pulse 1.6s ease-out infinite;
+  pointer-events: none;
+}
+
+@keyframes ca-badge-pulse {
+  0% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  70% {
+    opacity: 0;
+    transform: scale(2.6);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(2.6);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Drop the halo entirely rather than freezing it mid-expansion — a static
+     ring would read as a second, meaningless shape. The dot and its status
+     tint remain. */
+  .ca-badge__dot[data-pulse='true']::after {
+    animation: none;
+    display: none;
+  }
 }
