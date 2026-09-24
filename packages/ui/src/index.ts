@@ -13,7 +13,16 @@ export type { AvatarProps } from './core/Avatar'
 export { Badge } from './core/Badge'
 export type { BadgeProps, BadgeVariant, BadgeSize } from './core/Badge'
 export { Card, CardHeader, CardTitle, CardDescription, CardContent } from './core/Card'
-export type { CardProps } from './core/Card'
+export type {
+  CardProps,
+  CardHeaderProps,
+  CardTitleProps,
+  CardDescriptionProps,
+  CardContentProps,
+  CardVariant,
+  CardPadding,
+  CardRadius,
+} from './core/Card'
 export { Icon, iconNames } from './core/Icon'
 export type { IconProps, IconName } from './core/Icon'
 export { Kbd } from './core/Kbd'
