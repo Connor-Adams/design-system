@@ -1,5 +1,24 @@
 # @connor-adams/web
 
+## 0.0.13
+
+### Patch Changes
+
+- Updated dependencies [00e8a78]
+- Updated dependencies [a81bfa2]
+- Updated dependencies [1480360]
+- Updated dependencies [3b94f1a]
+- Updated dependencies [82018ac]
+- Updated dependencies [aaf85b3]
+- Updated dependencies [7200879]
+- Updated dependencies [f28b428]
+- Updated dependencies [f1fe24c]
+- Updated dependencies [ee02bbd]
+- Updated dependencies [445dd65]
+- Updated dependencies [ba043ce]
+- Updated dependencies [8cc0973]
+  - @connor-adams/designsystem@2.0.0
+
 ## 0.0.12
 
 ### Patch Changes
