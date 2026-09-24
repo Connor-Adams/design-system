@@ -1,0 +1,65 @@
+<!-- @dsCard group="Components" viewport="700x340" name="UploadButton" subtitle="File picker that looks like a Button" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="../../styles.css" />
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script>
+<style>
+  body { margin: 0; padding: 20px; background: var(--card); font-family: var(--font-sans); }
+  .wrap { display: flex; flex-direction: column; gap: 16px; }
+  .row { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; }
+  .cap { font-size: var(--text-label); text-transform: uppercase; letter-spacing: .06em; font-weight: 600; color: var(--muted-foreground); margin: 0 0 6px; }
+  .stack { display: flex; flex-direction: column; gap: 4px; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+  const { UploadButton, Text } = window.CashflowDesignSystem_2cf89d;
+  function Demo() {
+    const [picked, setPicked] = React.useState([]);
+    const [error, setError] = React.useState("");
+    const onPick = (files) => {
+      setError("");
+      setPicked(files.map((f) => f.name));
+    };
+    return (
+      <div className="wrap">
+        <div className="stack">
+          <Text variant="label" tone="muted">Default — single file</Text>
+          <div className="row">
+            <UploadButton accept=".csv,.ofx,.qfx" onFiles={onPick} onError={(bad) => setError(bad[0].message)}>
+              Import statement
+            </UploadButton>
+            <Text variant="body-sm" tone="muted">{picked.length ? picked.join(", ") : "Nothing picked yet"}</Text>
+          </div>
+        </div>
+        <div className="stack">
+          <Text variant="label" tone="muted">Variants &amp; sizes</Text>
+          <div className="row">
+            <UploadButton variant="primary">Upload</UploadButton>
+            <UploadButton variant="outline" size="sm">Upload</UploadButton>
+            <UploadButton variant="ghost" size="sm" multiple accept="audio/*">Upload sounds</UploadButton>
+          </div>
+        </div>
+        <div className="stack">
+          <Text variant="label" tone="muted">Busy &amp; disabled</Text>
+          <div className="row">
+            <UploadButton loading loadingLabel="Uploading…">Upload</UploadButton>
+            <UploadButton disabled>Upload</UploadButton>
+            <UploadButton maxSize={1000} onError={(bad) => setError(bad[0].message)}>Upload (max 1 KB)</UploadButton>
+          </div>
+        </div>
+        {error ? <Text variant="body-sm" tone="negative">{error}</Text> : null}
+      </div>
+    );
+  }
+  ReactDOM.createRoot(document.getElementById('root')).render(<Demo />);
+</script>
+</body>
+</html>

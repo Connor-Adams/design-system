@@ -55,7 +55,7 @@ export type { CategoryPillProps } from './finance/CategoryPill'
 export { categoryVisual, categoryIconName } from './finance/categoryIcon'
 export type { CategoryVisual, CategoryOverrides } from './finance/categoryIcon'
 export { ImportDropzone } from './finance/ImportDropzone'
-export type { ImportDropzoneProps } from './finance/ImportDropzone'
+export type { ImportDropzoneProps, ImportDropzoneRejection } from './finance/ImportDropzone'
 export { MoneyInput } from './finance/MoneyInput'
 export type { MoneyInputProps } from './finance/MoneyInput'
 export { PeriodSelector } from './finance/PeriodSelector'
@@ -84,6 +84,15 @@ export { Textarea } from './forms/Textarea'
 export type { TextareaProps } from './forms/Textarea'
 export { ToggleGroup } from './forms/ToggleGroup'
 export type { ToggleGroupProps, ToggleItem } from './forms/ToggleGroup'
+export { UploadButton } from './forms/UploadButton'
+export type { UploadButtonProps } from './forms/UploadButton'
+export { formatFileSize, matchesAccept, selectFiles } from './forms/fileSelect'
+export type {
+  FileRejection,
+  FileRejectionCode,
+  FileSelectResult,
+  FileSelectRules,
+} from './forms/fileSelect'
 export { Breadcrumb } from './navigation/Breadcrumb'
 export type { BreadcrumbProps, BreadcrumbItem } from './navigation/Breadcrumb'
 export { Pagination } from './navigation/Pagination'

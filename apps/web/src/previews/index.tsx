@@ -45,6 +45,7 @@ import {
   Switch,
   Textarea,
   ToggleGroup,
+  UploadButton,
   // navigation
   Breadcrumb,
   Pagination,
@@ -84,6 +85,50 @@ function PeriodSelectorPreview(): React.JSX.Element {
 function PaginationPreview(): React.JSX.Element {
   const [page, setPage] = React.useState(3)
   return <Pagination page={page} pageCount={10} onPageChange={setPage} siblingCount={1} />
+}
+
+function UploadButtonPreview(): React.JSX.Element {
+  const [picked, setPicked] = React.useState<string[]>([])
+  const [error, setError] = React.useState('')
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+      <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
+        <UploadButton
+          accept=".csv,.ofx,.qfx"
+          maxSize={10 * 1e6}
+          onFiles={(files) => {
+            setError('')
+            setPicked(files.map((f) => f.name))
+          }}
+          onError={(rejections) => setError(rejections[0]?.message ?? '')}
+        >
+          Import statement
+        </UploadButton>
+        <Text variant="body-sm" tone="muted">
+          {picked.length > 0 ? picked.join(', ') : 'Nothing picked yet'}
+        </Text>
+      </div>
+      {error ? (
+        <Text variant="body-sm" tone="negative">
+          {error}
+        </Text>
+      ) : null}
+    </div>
+  )
+}
+
+function ImportDropzonePreview(): React.JSX.Element {
+  const [files, setFiles] = React.useState<File[]>([])
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+      <ImportDropzone files={files} onFiles={setFiles} maxSize={10 * 1e6} />
+      <div>
+        <Button variant="ghost" size="sm" disabled={files.length === 0} onClick={() => setFiles([])}>
+          Clear selection
+        </Button>
+      </div>
+    </div>
+  )
 }
 
 // ---------------------------------------------------------------------------
@@ -460,9 +505,19 @@ export const previews: Record<string, Variant[]> = {
   ],
 
   'import-dropzone': [
-    { label: 'Example', node: (
-      <ImportDropzone accept=".csv,.ofx,.qfx" hint="CSV, OFX or QFX · up to 10MB" />
+    { label: 'Default', node: (
+      <ImportDropzone accept=".csv,.ofx,.qfx" maxSize={10 * 1e6} hint="CSV, OFX or QFX · up to 10MB" />
     )},
+    { label: 'Slotted copy', node: (
+      <ImportDropzone
+        multiple
+        accept="image/*,.pdf"
+        label="Drop receipts, or browse"
+        hint="PNG, JPG or PDF · any number"
+        replaceLabel="click to change"
+      />
+    )},
+    { label: 'Controlled', node: <ImportDropzonePreview /> },
   ],
 
   'money-input': [
@@ -603,6 +658,23 @@ export const previews: Record<string, Variant[]> = {
         defaultValue="list"
       />
     )},
+  ],
+
+  'upload-button': [
+    { label: 'Variants', node: (
+      <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
+        <UploadButton variant="primary">Import statement</UploadButton>
+        <UploadButton variant="secondary">Upload</UploadButton>
+        <UploadButton variant="outline" size="sm">Upload</UploadButton>
+      </div>
+    )},
+    { label: 'States', node: (
+      <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
+        <UploadButton loading loadingLabel="Uploading…">Upload</UploadButton>
+        <UploadButton disabled>Upload</UploadButton>
+      </div>
+    )},
+    { label: 'Interactive', node: <UploadButtonPreview /> },
   ],
 
   // --- navigation -----------------------------------------------------------
