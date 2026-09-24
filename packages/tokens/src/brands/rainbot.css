@@ -1,0 +1,171 @@
+/* ─────────────────────────────────────────────────────────────────────────
+ * Rainbot — brand scope
+ *
+ * A brand is expressed by re-pointing the semantic layer at a different
+ * primitive ramp. Components only ever read semantic names, so a second brand
+ * needs no component changes and no fork — just this file.
+ *
+ * SCOPE: `:root[data-brand="rainbot"]`. Set the attribute on <html>:
+ *   <html data-brand="rainbot" data-theme="dark">
+ *
+ * IMPORT ORDER IS LOAD-BEARING. This selector has the same specificity as
+ * `:root[data-theme="dark"]` in semantic.css, so it wins on source order only.
+ * Import it AFTER `@connor-adams/tokens/styles.css`, never before:
+ *   @import "@connor-adams/tokens/styles.css";
+ *   @import "@connor-adams/tokens/brands/rainbot.css";
+ *
+ * Rainbot is dark-only by design — it is a Discord dashboard, and Discord is
+ * dark. There is deliberately no light block. For that reason this file
+ * redefines the COMPLETE semantic surface rather than only the deltas: a token
+ * left unset would silently fall through to whichever Cashflow theme block is
+ * active and render oxblood.
+ * ──────────────────────────────────────────────────────────────────────── */
+
+:root[data-brand="rainbot"] {
+  /* ── Primitives ───────────────────────────────────────────────────────
+   * Prefixed `--rb-` so they cannot collide with the shared ramps in
+   * colors.css. Carried over from the palette Rainbot already shipped, so
+   * adopting the brand scope is structural, not a re-skin. */
+
+  /* Near-black ground. Discord's own surfaces sit around #313338, so going
+   * darker keeps the dashboard from reading as a Discord clone. */
+  --rb-ink-950: #0a0a0f;
+  --rb-ink-900: #0f0f14;
+  --rb-ink-850: #131318;
+  --rb-ink-800: #181820;
+  --rb-ink-750: #1c1c24;
+  --rb-ink-700: #252530;
+  --rb-ink-600: #2d2d3a;
+  --rb-ink-500: #4a4a55;
+  --rb-ink-400: #6b6b7a;
+  --rb-ink-300: #a1a1b0;
+  --rb-ink-50: #ffffff;
+
+  /* The signature triad: blue → violet → pink. Used as a gradient for brand
+   * moments and individually as primary / secondary / accent. */
+  --rb-blue-300: #93c5fd;
+  --rb-blue-400: #60a5fa;
+  --rb-blue-500: #3b82f6;
+  --rb-blue-600: #2563eb;
+  --rb-violet-300: #c4b5fd;
+  --rb-violet-400: #a78bfa;
+  --rb-violet-500: #8b5cf6;
+  --rb-violet-600: #7c3aed;
+  --rb-pink-300: #f9a8d4;
+  --rb-pink-400: #f472b6;
+  --rb-pink-500: #ec4899;
+  --rb-pink-600: #db2777;
+
+  /* Status. Kept distinct from the brand triad so "it worked" and "it is a
+   * brand surface" never read as the same colour. */
+  --rb-green-400: #34d399;
+  --rb-green-500: #10b981;
+  --rb-amber-400: #fbbf24;
+  --rb-amber-500: #f59e0b;
+  --rb-red-400: #f87171;
+  --rb-red-500: #ef4444;
+
+  /* ── Semantic layer ───────────────────────────────────────────────────
+   * These names are the contract with the design system's components. Values
+   * are Rainbot's; names are the shared vocabulary. */
+
+  /* Surfaces */
+  --background: var(--rb-ink-950);
+  --card: var(--rb-ink-850);
+  --popover: var(--rb-ink-800);
+  --muted: var(--rb-ink-750);
+
+  /* Text */
+  --foreground: var(--rb-ink-50);
+  --card-foreground: var(--foreground);
+  --popover-foreground: var(--foreground);
+  --muted-foreground: var(--rb-ink-300);
+
+  /* Brand */
+  --primary: var(--rb-blue-500);
+  --primary-hover: var(--rb-blue-600);
+  --primary-foreground: var(--rb-ink-50);
+
+  /* Accent — Rainbot's third brand hue, not a subtle fill like Cashflow's */
+  --accent: var(--rb-pink-500);
+  --accent-foreground: var(--rb-ink-50);
+
+  /* Links are a visible blue here, unlike Cashflow's neutral-underline style */
+  --text-link: var(--rb-blue-400);
+  --text-link-hover: var(--rb-blue-300);
+
+  /* Semantic signals */
+  --success: var(--rb-green-500);
+  --success-bg: #0c2a20;
+  --success-foreground: var(--rb-ink-50);
+  --warning: var(--rb-amber-500);
+  --warning-bg: #33260a;
+  --warning-foreground: var(--rb-ink-950);
+  --danger: var(--rb-red-500);
+  --danger-bg: #331416;
+  --danger-foreground: var(--rb-ink-50);
+  --info: var(--rb-blue-400);
+  --info-bg: #10203a;
+  --info-foreground: var(--rb-ink-50);
+
+  /* Money semantics. Rainbot has no money — these exist only so a Cashflow
+   * component pulled in by mistake renders in Rainbot's palette instead of
+   * silently inheriting oxblood from the theme block underneath. */
+  --positive: var(--rb-green-500);
+  --positive-foreground: var(--rb-ink-950);
+  --negative: var(--rb-red-500);
+  --negative-bg: #331416;
+
+  /* Destructive (delete actions) */
+  --destructive: var(--rb-red-500);
+  --destructive-foreground: var(--rb-ink-50);
+
+  /* Structural.
+   *
+   * NOTE — deliberate divergence from Cashflow: there, --secondary is a quiet
+   * neutral chip surface (zinc-100). Here it is the violet brand hue, because
+   * Rainbot's shipped UI leans on `bg-secondary` / `border-secondary` /
+   * `from-primary to-secondary` as brand gradient stops. Consequence:
+   * <Button variant="secondary"> renders a saturated violet button under this
+   * brand, not a subtle one. If that is wrong for a given surface, override at
+   * the component call site rather than re-pointing this token — the gradient
+   * usages depend on it. */
+  --secondary: var(--rb-violet-500);
+  --secondary-hover: var(--rb-violet-600);
+  --secondary-foreground: var(--rb-ink-50);
+  --border: var(--rb-ink-700);
+  --input: var(--rb-ink-900);
+  --ring: var(--rb-blue-500);
+
+  /* Chart palette. Categorical ramp walks the brand triad first, then status
+   * hues, so a 5-series chart never repeats a hue and never reads as a signal
+   * where none is meant. */
+  --chart-1: var(--rb-blue-500);
+  --chart-2: var(--rb-violet-500);
+  --chart-3: var(--rb-pink-500);
+  --chart-4: var(--rb-green-500);
+  --chart-5: var(--rb-ink-400);
+  --chart-line-1: var(--rb-blue-400);
+  --chart-line-2: var(--rb-violet-400);
+  --chart-line-3: var(--rb-pink-400);
+  --chart-line-4: var(--rb-green-400);
+  --chart-line-5: var(--rb-amber-400);
+  --chart-line-6: var(--rb-red-400);
+
+  /* Cashflow's domain-named chart aliases. Same safety-net reasoning as the
+   * money semantics above: mapped, not left to inherit oxblood. */
+  --chart-spend: var(--rb-pink-500);
+  --chart-credit: var(--rb-green-500);
+  --chart-payment: var(--rb-ink-400);
+  --chart-business: var(--rb-blue-500);
+  --chart-personal: var(--rb-violet-500);
+
+  /* Gradient. Rainbot's brand moment is the blue → violet → pink sweep, not
+   * Cashflow's orange → magenta. --gradient-hero-from/to are consumed by
+   * chart and bar fills, so both stops move together with the full gradient. */
+  --gradient-hero: linear-gradient(135deg, var(--rb-blue-500), var(--rb-violet-500), var(--rb-pink-500));
+  --gradient-hero-from: var(--rb-blue-500);
+  --gradient-hero-to: var(--rb-pink-500);
+
+  color-scheme: dark;
+}

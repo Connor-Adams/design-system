@@ -18,6 +18,7 @@
   ],
   "exports": {
     "./styles.css": "./styles.css",
+    "./brands/rainbot.css": "./src/brands/rainbot.css",
     "./src/*": "./src/*"
   },
   "files": [
