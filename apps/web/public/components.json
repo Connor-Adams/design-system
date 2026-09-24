@@ -98,7 +98,7 @@
       "name": "Badge",
       "category": "core",
       "docs": "/components/badge",
-      "summary": "Small pill for status, category, and counts — `default` is oxblood brand fill, `secondary` the neutral workhorse.",
+      "summary": "Small pill for status, category, and counts — `default` is oxblood brand fill, `secondary` the neutral workhorse, and `dot`/`pulse` turn it into a live status indicator.",
       "props": [
         {
           "name": "variant",
@@ -106,6 +106,27 @@
           "required": false,
           "defaultValue": "default",
           "description": ""
+        },
+        {
+          "name": "size",
+          "type": "BadgeSize | undefined",
+          "required": false,
+          "defaultValue": "default",
+          "description": "Type/padding scale. `default` is the historical 2px/8px pill; `sm` is the\ndenser chip for table cells and dense stat rows."
+        },
+        {
+          "name": "dot",
+          "type": "boolean | undefined",
+          "required": false,
+          "defaultValue": "false",
+          "description": "Render a leading status dot, tinted from the variant. The dot is\n`aria-hidden` — the label carries the meaning, so a label is required\n(or an explicit `aria-label` if you render a dot with no text)."
+        },
+        {
+          "name": "pulse",
+          "type": "boolean | undefined",
+          "required": false,
+          "defaultValue": "false",
+          "description": "Gently pulse the status dot to draw attention to a live/changing state.\nImplies `dot`. Frozen under `prefers-reduced-motion`."
         }
       ]
     },
@@ -137,8 +158,30 @@
       "name": "Card",
       "category": "core",
       "docs": "/components/card",
-      "summary": "The default raised surface — white card, hairline border, light shadow, rounded-lg. Everything sits in one.",
-      "props": []
+      "summary": "The default raised surface — white card, hairline border, light shadow, rounded-lg. Everything sits in one. Configurable enough that you should never hand-roll a panel/section div.",
+      "props": [
+        {
+          "name": "variant",
+          "type": "CardVariant | undefined",
+          "required": false,
+          "defaultValue": "default",
+          "description": "Surface treatment. Defaults to the raised bordered card."
+        },
+        {
+          "name": "padding",
+          "type": "CardPadding | undefined",
+          "required": false,
+          "defaultValue": "default",
+          "description": "Padding density off the `--space-*` ladder. Defaults to `--space-5` (20px)."
+        },
+        {
+          "name": "radius",
+          "type": "CardRadius | undefined",
+          "required": false,
+          "defaultValue": "lg",
+          "description": "Corner radius off the `--radius-*` ladder. Defaults to `--radius-lg`."
+        }
+      ]
     },
     {
       "slug": "icon",
@@ -227,7 +270,7 @@
       "name": "Progress",
       "category": "core",
       "docs": "/components/progress",
-      "summary": "A determinate bar for budgets, savings goals, and import progress. Use `tone` to signal state (e.g. `danger` when a category is over budget).",
+      "summary": "A determinate bar for budgets, savings goals, import progress, and playback. Use `tone` to signal state (e.g. `danger` when a category is over budget), `valueText` when a percentage is the wrong readout, and `segments` for a stacked bar.",
       "props": [
         {
           "name": "value",
@@ -238,7 +281,7 @@
         },
         {
           "name": "tone",
-          "type": "(string & {}) | \"success\" | \"primary\" | \"danger\" | \"warning\" | undefined",
+          "type": "(string & {}) | \"success\" | \"warning\" | \"primary\" | \"danger\" | undefined",
           "required": false,
           "defaultValue": "primary",
           "description": ""
@@ -270,6 +313,20 @@
           "required": false,
           "defaultValue": "false",
           "description": ""
+        },
+        {
+          "name": "valueText",
+          "type": "ReactNode",
+          "required": false,
+          "defaultValue": null,
+          "description": "Free-form readout replacing the generated percent, e.g. \"1:23 / 4:56\"."
+        },
+        {
+          "name": "segments",
+          "type": "ProgressSegment[] | undefined",
+          "required": false,
+          "defaultValue": null,
+          "description": "Stacked bands, rendered left to right. Supersedes `value` and\n`indeterminate`. Values are percentages of the track; if they sum past 100\nevery band is scaled down proportionally so the stack still fills exactly\none track (nothing is clipped or dropped) and the track gets\n`data-overflow=\"true\"`."
         }
       ]
     },
@@ -385,6 +442,164 @@
       ]
     },
     {
+      "slug": "chart-frame",
+      "name": "ChartFrame",
+      "category": "data",
+      "docs": "/components/chart-frame",
+      "summary": "ChartFrame component",
+      "props": [
+        {
+          "name": "title",
+          "type": "ReactNode",
+          "required": false,
+          "defaultValue": null,
+          "description": "Header heading. Omit (with subtitle and actions) to drop the header row."
+        },
+        {
+          "name": "subtitle",
+          "type": "ReactNode",
+          "required": false,
+          "defaultValue": null,
+          "description": "Secondary line under the title."
+        },
+        {
+          "name": "actions",
+          "type": "ReactNode",
+          "required": false,
+          "defaultValue": null,
+          "description": "Right-aligned header controls — a period selector, a menu, a legend toggle."
+        },
+        {
+          "name": "footer",
+          "type": "ReactNode",
+          "required": false,
+          "defaultValue": null,
+          "description": "Legend or source note rendered under the plot."
+        },
+        {
+          "name": "height",
+          "type": "ChartFrameHeight | undefined",
+          "required": false,
+          "defaultValue": "280",
+          "description": "Plot height in px, or `'auto'` to derive it from `rowCount`. Default 280."
+        },
+        {
+          "name": "rowCount",
+          "type": "number | undefined",
+          "required": false,
+          "defaultValue": "0",
+          "description": "Rows in the chart. Drives the height when `height=\"auto\"`. Default 0."
+        },
+        {
+          "name": "rowHeight",
+          "type": "number | undefined",
+          "required": false,
+          "defaultValue": "32",
+          "description": "Px per row in `'auto'` mode. Default 32."
+        },
+        {
+          "name": "minHeight",
+          "type": "number | undefined",
+          "required": false,
+          "defaultValue": "200",
+          "description": "Floor for the resolved height. Default 200."
+        },
+        {
+          "name": "maxHeight",
+          "type": "number | undefined",
+          "required": false,
+          "defaultValue": "560",
+          "description": "Ceiling for the resolved height. Default 560."
+        },
+        {
+          "name": "padding",
+          "type": "ChartFramePadding | undefined",
+          "required": false,
+          "defaultValue": "default",
+          "description": "Shell padding scale. `'none'` lets the plot bleed to the card edge."
+        }
+      ]
+    },
+    {
+      "slug": "data-table",
+      "name": "DataTable",
+      "category": "data",
+      "docs": "/components/data-table",
+      "summary": "DataTable component",
+      "props": [
+        {
+          "name": "columns",
+          "type": "DataTableColumn<T>[]",
+          "required": true,
+          "defaultValue": null,
+          "description": "Column definitions, left to right."
+        },
+        {
+          "name": "rows",
+          "type": "T[]",
+          "required": true,
+          "defaultValue": null,
+          "description": "The rows to render, in the order they should appear."
+        },
+        {
+          "name": "getRowKey",
+          "type": "(row: T, index: number) => Key",
+          "required": true,
+          "defaultValue": null,
+          "description": "Stable React key per row. Required on purpose: keying by array index\nsilently corrupts state when rows are sorted, filtered or paginated."
+        },
+        {
+          "name": "sort",
+          "type": "DataTableSort | null | undefined",
+          "required": false,
+          "defaultValue": null,
+          "description": "Controlled sort state, or `null`/omitted for unsorted."
+        },
+        {
+          "name": "onSortChange",
+          "type": "((sort: DataTableSort | null) => void) | undefined",
+          "required": false,
+          "defaultValue": null,
+          "description": "Called with the next sort state when a sort button is activated."
+        },
+        {
+          "name": "empty",
+          "type": "ReactNode",
+          "required": false,
+          "defaultValue": null,
+          "description": "Shown in a full-width cell when `rows` is empty and not loading."
+        },
+        {
+          "name": "loading",
+          "type": "boolean | undefined",
+          "required": false,
+          "defaultValue": null,
+          "description": "Replace the body with shimmering `Skeleton` rows."
+        },
+        {
+          "name": "loadingRows",
+          "type": "number | undefined",
+          "required": false,
+          "defaultValue": null,
+          "description": "How many skeleton rows to render while `loading`. Default 4."
+        },
+        {
+          "name": "maxHeight",
+          "type": "string | undefined",
+          "required": false,
+          "defaultValue": null,
+          "description": "Max height of the scroll region; the head stays sticky above it."
+        },
+        {
+          "name": "containerClassName",
+          "type": "string | undefined",
+          "required": false,
+          "defaultValue": null,
+          "description": "Class for the scroll container (the element `maxHeight` constrains)."
+        }
+      ]
+    },
+    {
       "slug": "letter-avatar",
       "name": "LetterAvatar",
       "category": "data",
@@ -448,6 +663,50 @@
           "required": false,
           "defaultValue": "gain",
           "description": ""
+        },
+        {
+          "name": "bare",
+          "type": "boolean | undefined",
+          "required": false,
+          "defaultValue": "false",
+          "description": "Drop the card shell (border, background, elevation), keep the padding."
+        }
+      ]
+    },
+    {
+      "slug": "stat-grid",
+      "name": "StatGrid",
+      "category": "data",
+      "docs": "/components/stat-grid",
+      "summary": "StatGrid component",
+      "props": [
+        {
+          "name": "columns",
+          "type": "number | \"auto\" | undefined",
+          "required": false,
+          "defaultValue": "auto",
+          "description": "Track count, or `'auto'` for a responsive auto-fit grid. Default `'auto'`."
+        },
+        {
+          "name": "minItemWidth",
+          "type": "string | number | undefined",
+          "required": false,
+          "defaultValue": "180",
+          "description": "Minimum auto-fit track width — a number is px. Only used when `columns=\"auto\"`. Default `180`."
+        },
+        {
+          "name": "gap",
+          "type": "StatGridGap | undefined",
+          "required": false,
+          "defaultValue": "md",
+          "description": "Gutter step. Ignored when `divided` (separators replace the gutter). Default `'md'`."
+        },
+        {
+          "name": "divided",
+          "type": "boolean | undefined",
+          "required": false,
+          "defaultValue": "false",
+          "description": "Hairline separators between cells instead of gutters."
         }
       ]
     },
@@ -464,6 +723,13 @@
           "required": false,
           "defaultValue": null,
           "description": ""
+        },
+        {
+          "name": "containerClassName",
+          "type": "string | undefined",
+          "required": false,
+          "defaultValue": null,
+          "description": "Class for the scroll container — the element `maxHeight` constrains."
         }
       ]
     },
@@ -494,6 +760,13 @@
           "required": false,
           "defaultValue": null,
           "description": ""
+        },
+        {
+          "name": "overflow",
+          "type": "TabsOverflow | undefined",
+          "required": false,
+          "defaultValue": "wrap",
+          "description": "`wrap` (default) preserves the multi-row wrap; `scroll` scrolls one row."
         }
       ]
     },
@@ -931,28 +1204,91 @@
       "name": "ImportDropzone",
       "category": "finance",
       "docs": "/components/import-dropzone",
-      "summary": "The statement-import target for the import flow — drag-and-drop or click-to-browse a CSV/OFX file.",
+      "summary": "A drag-and-drop file intake surface — drop or click-to-browse. Defaults to the statement-import wording, but every piece of copy is a slot, so it works for receipts, exports or audio too.",
       "props": [
         {
           "name": "accept",
           "type": "string | undefined",
           "required": false,
           "defaultValue": ".csv,.ofx,.qfx",
-          "description": ""
+          "description": "Accepted types, `accept`-attribute syntax. Enforced on drop as well as on browse."
+        },
+        {
+          "name": "multiple",
+          "type": "boolean | undefined",
+          "required": false,
+          "defaultValue": "false",
+          "description": "Allow more than one file per selection."
+        },
+        {
+          "name": "maxSize",
+          "type": "number | undefined",
+          "required": false,
+          "defaultValue": null,
+          "description": "Hard byte ceiling, enforced on both intake paths. Omit for no limit."
         },
         {
           "name": "onFile",
           "type": "((file: File) => void) | undefined",
           "required": false,
           "defaultValue": null,
-          "description": ""
+          "description": "Legacy singular callback — receives the first accepted file. Still supported."
+        },
+        {
+          "name": "onFiles",
+          "type": "((files: File[]) => void) | undefined",
+          "required": false,
+          "defaultValue": null,
+          "description": "Receives every accepted file from a selection."
+        },
+        {
+          "name": "onError",
+          "type": "((rejections: FileRejection[]) => void) | undefined",
+          "required": false,
+          "defaultValue": null,
+          "description": "Receives anything `accept`/`maxSize` turned away, from either intake path."
         },
         {
           "name": "hint",
           "type": "ReactNode",
           "required": false,
           "defaultValue": "CSV, OFX or QFX · up to 10MB",
-          "description": ""
+          "description": "Secondary line under the primary copy."
+        },
+        {
+          "name": "label",
+          "type": "ReactNode",
+          "required": false,
+          "defaultValue": null,
+          "description": "Primary copy. Defaults to the statement-import wording."
+        },
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "required": false,
+          "defaultValue": null,
+          "description": "Alias for `label`, for callers who prefer a child."
+        },
+        {
+          "name": "replaceLabel",
+          "type": "ReactNode",
+          "required": false,
+          "defaultValue": "click to replace",
+          "description": "The replace affordance shown next to the size once a file is chosen."
+        },
+        {
+          "name": "files",
+          "type": "readonly File[] | null | undefined",
+          "required": false,
+          "defaultValue": null,
+          "description": "Controlled selection. Passing this (including `[]`/`null`) takes ownership."
+        },
+        {
+          "name": "disabled",
+          "type": "boolean | undefined",
+          "required": false,
+          "defaultValue": "false",
+          "description": "Refuse both intake paths and dim the surface."
         }
       ]
     },
@@ -1238,11 +1574,62 @@
           "description": ""
         },
         {
+          "name": "name",
+          "type": "string | undefined",
+          "required": false,
+          "defaultValue": null,
+          "description": "Form control name — forwarded to the inner search `<input>`."
+        },
+        {
           "name": "size",
           "type": "\"sm\" | \"default\" | undefined",
           "required": false,
           "defaultValue": "default",
           "description": ""
+        }
+      ]
+    },
+    {
+      "slug": "field",
+      "name": "Field",
+      "category": "forms",
+      "docs": "/components/field",
+      "summary": "Field component",
+      "props": [
+        {
+          "name": "label",
+          "type": "ReactNode",
+          "required": false,
+          "defaultValue": null,
+          "description": "Label content. Omit for a field that is labelled some other way."
+        },
+        {
+          "name": "hint",
+          "type": "ReactNode",
+          "required": false,
+          "defaultValue": null,
+          "description": "Help text below the control. Hidden while `error` is set."
+        },
+        {
+          "name": "error",
+          "type": "ReactNode",
+          "required": false,
+          "defaultValue": null,
+          "description": "Error text below the control. Takes precedence over `hint`."
+        },
+        {
+          "name": "required",
+          "type": "boolean | undefined",
+          "required": false,
+          "defaultValue": null,
+          "description": "Marks the control `aria-required` and prints the label's `*`."
+        },
+        {
+          "name": "id",
+          "type": "string | undefined",
+          "required": false,
+          "defaultValue": null,
+          "description": "Control id. Generated when omitted (a child's own `id` wins over both)."
         }
       ]
     },
@@ -1259,6 +1646,41 @@
           "required": false,
           "defaultValue": null,
           "description": ""
+        },
+        {
+          "name": "leadingIcon",
+          "type": "ReactNode",
+          "required": false,
+          "defaultValue": null,
+          "description": "Node rendered inside the field's left edge. Decorative (`aria-hidden`)."
+        },
+        {
+          "name": "trailingIcon",
+          "type": "ReactNode",
+          "required": false,
+          "defaultValue": null,
+          "description": "Node rendered inside the field's right edge. Decorative (`aria-hidden`)."
+        },
+        {
+          "name": "clearable",
+          "type": "boolean | undefined",
+          "required": false,
+          "defaultValue": "false",
+          "description": "Render a clear button once the field has a value. It is a real `<button>`\nwith an accessible name, and is disabled (so out of the tab order) while\nthere is nothing to clear."
+        },
+        {
+          "name": "onClear",
+          "type": "(() => void) | undefined",
+          "required": false,
+          "defaultValue": null,
+          "description": "Called after the clear button is pressed. Controlled callers clear here."
+        },
+        {
+          "name": "clearLabel",
+          "type": "string | undefined",
+          "required": false,
+          "defaultValue": "Clear",
+          "description": "Accessible name for the clear button."
         }
       ]
     },
@@ -1399,6 +1821,13 @@
           "required": false,
           "defaultValue": null,
           "description": ""
+        },
+        {
+          "name": "name",
+          "type": "string | undefined",
+          "required": false,
+          "defaultValue": null,
+          "description": "Form control name — forwarded to the inner `input[type=range]`."
         },
         {
           "name": "disabled",
@@ -1600,6 +2029,99 @@
       ]
     },
     {
+      "slug": "upload-button",
+      "name": "UploadButton",
+      "category": "forms",
+      "docs": "/components/upload-button",
+      "summary": "A file picker that looks like a Button — use it anywhere the app needs \"pick a file\" without hand-rolling a hidden `<input type=\"file\">` and a proxy button.",
+      "props": [
+        {
+          "name": "accept",
+          "type": "string | undefined",
+          "required": false,
+          "defaultValue": null,
+          "description": "`accept` attribute for the input, e.g. `.csv,.ofx` or `audio/*`."
+        },
+        {
+          "name": "multiple",
+          "type": "boolean | undefined",
+          "required": false,
+          "defaultValue": "false",
+          "description": "Allow picking more than one file."
+        },
+        {
+          "name": "maxSize",
+          "type": "number | undefined",
+          "required": false,
+          "defaultValue": null,
+          "description": "Hard byte ceiling; files over it are rejected instead of handed over."
+        },
+        {
+          "name": "onFiles",
+          "type": "((files: File[]) => void) | undefined",
+          "required": false,
+          "defaultValue": null,
+          "description": "Called with the accepted files after every selection."
+        },
+        {
+          "name": "onError",
+          "type": "((rejections: FileRejection[]) => void) | undefined",
+          "required": false,
+          "defaultValue": null,
+          "description": "Called with anything `accept`/`maxSize` turned away."
+        },
+        {
+          "name": "loading",
+          "type": "boolean | undefined",
+          "required": false,
+          "defaultValue": "false",
+          "description": "Upload in flight — disables the control and sets `aria-busy`."
+        },
+        {
+          "name": "variant",
+          "type": "ButtonVariant | undefined",
+          "required": false,
+          "defaultValue": "secondary",
+          "description": "Button treatment. Forwarded to `core/Button`."
+        },
+        {
+          "name": "size",
+          "type": "ButtonSize | undefined",
+          "required": false,
+          "defaultValue": "default",
+          "description": "Button size. Forwarded to `core/Button`."
+        },
+        {
+          "name": "icon",
+          "type": "ReactNode",
+          "required": false,
+          "defaultValue": null,
+          "description": "Leading node, swapped for a Spinner while `loading`. Icons are nodes — no icon dep."
+        },
+        {
+          "name": "loadingLabel",
+          "type": "ReactNode",
+          "required": false,
+          "defaultValue": null,
+          "description": "Label shown while `loading`; falls back to `children`."
+        },
+        {
+          "name": "inputRef",
+          "type": "Ref<HTMLInputElement> | undefined",
+          "required": false,
+          "defaultValue": null,
+          "description": "Escape hatch onto the hidden input (e.g. to clear it imperatively)."
+        },
+        {
+          "name": "inputProps",
+          "type": "Omit<InputHTMLAttributes<HTMLInputElement>, \"ref\" | \"onChange\" | \"type\" | \"multiple\" | \"accept\"> | undefined",
+          "required": false,
+          "defaultValue": null,
+          "description": "Extra attributes for the hidden input."
+        }
+      ]
+    },
+    {
       "slug": "breadcrumb",
       "name": "Breadcrumb",
       "category": "navigation",
@@ -1653,11 +2175,160 @@
       ]
     },
     {
+      "slug": "confirm-dialog",
+      "name": "ConfirmDialog",
+      "category": "overlays",
+      "docs": "/components/confirm-dialog",
+      "summary": "The `window.confirm` replacement: an `alertdialog` with a title, one consequence line, and exactly two buttons. Reach for it before any destructive action (delete transaction, remove account, merge categories). Built on `Dialog`, so it inherits the focus trap, focus restore, dismiss stack and scroll lock.",
+      "props": [
+        {
+          "name": "open",
+          "type": "boolean",
+          "required": true,
+          "defaultValue": null,
+          "description": ""
+        },
+        {
+          "name": "title",
+          "type": "ReactNode",
+          "required": false,
+          "defaultValue": null,
+          "description": ""
+        },
+        {
+          "name": "description",
+          "type": "ReactNode",
+          "required": false,
+          "defaultValue": null,
+          "description": ""
+        },
+        {
+          "name": "confirmLabel",
+          "type": "string | undefined",
+          "required": false,
+          "defaultValue": "Confirm",
+          "description": "Confirm button text. Default `Confirm`."
+        },
+        {
+          "name": "cancelLabel",
+          "type": "string | undefined",
+          "required": false,
+          "defaultValue": "Cancel",
+          "description": "Cancel button text. Default `Cancel`."
+        },
+        {
+          "name": "tone",
+          "type": "ConfirmTone | undefined",
+          "required": false,
+          "defaultValue": "default",
+          "description": "`destructive` tints the confirm button and — deliberately — focuses Cancel\non open, so a reflexive Enter cannot delete anything."
+        },
+        {
+          "name": "onConfirm",
+          "type": "(() => void | Promise<unknown>) | undefined",
+          "required": false,
+          "defaultValue": null,
+          "description": "The action. May return a promise: the confirm button goes into a pending\nstate, both buttons disable, Escape and scrim clicks stop closing, and the\ndialog stays open until it settles. A rejection is surfaced (see\n`onError`), never swallowed, and the dialog stays open so the user can retry."
+        },
+        {
+          "name": "onCancel",
+          "type": "(() => void) | undefined",
+          "required": false,
+          "defaultValue": null,
+          "description": ""
+        },
+        {
+          "name": "onClose",
+          "type": "(() => void) | undefined",
+          "required": false,
+          "defaultValue": null,
+          "description": "Called after a successful confirm, after cancel, and on Escape/scrim."
+        },
+        {
+          "name": "onError",
+          "type": "((error: unknown) => void) | undefined",
+          "required": false,
+          "defaultValue": null,
+          "description": "Handles a rejected/throwing `onConfirm`. Without it the error is re-thrown\nduring render so the nearest error boundary sees it rather than it\nvanishing into a dead promise."
+        },
+        {
+          "name": "pending",
+          "type": "boolean | undefined",
+          "required": false,
+          "defaultValue": null,
+          "description": "Force the pending state (for a confirm driven by external state)."
+        },
+        {
+          "name": "size",
+          "type": "\"sm\" | \"lg\" | \"default\" | undefined",
+          "required": false,
+          "defaultValue": "sm",
+          "description": ""
+        },
+        {
+          "name": "closeOnEscape",
+          "type": "boolean | undefined",
+          "required": false,
+          "defaultValue": "true",
+          "description": ""
+        },
+        {
+          "name": "closeOnOverlayClick",
+          "type": "boolean | undefined",
+          "required": false,
+          "defaultValue": "true",
+          "description": ""
+        },
+        {
+          "name": "portal",
+          "type": "boolean | undefined",
+          "required": false,
+          "defaultValue": null,
+          "description": ""
+        },
+        {
+          "name": "container",
+          "type": "Element | DocumentFragment | null | undefined",
+          "required": false,
+          "defaultValue": null,
+          "description": ""
+        },
+        {
+          "name": "lockScroll",
+          "type": "boolean | undefined",
+          "required": false,
+          "defaultValue": null,
+          "description": ""
+        },
+        {
+          "name": "className",
+          "type": "string | undefined",
+          "required": false,
+          "defaultValue": null,
+          "description": ""
+        },
+        {
+          "name": "style",
+          "type": "CSSProperties | undefined",
+          "required": false,
+          "defaultValue": null,
+          "description": ""
+        },
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "required": false,
+          "defaultValue": null,
+          "description": "Extra detail rendered in the dialog body above the actions."
+        }
+      ]
+    },
+    {
       "slug": "dialog",
       "name": "Dialog",
       "category": "overlays",
       "docs": "/components/dialog",
-      "summary": "A modal for confirmations and short forms (delete transaction, edit category, add account). Keep the footer to one primary + one secondary Button.",
+      "summary": "A modal for confirmations and short forms (delete transaction, edit category, add account). Keep the footer to one primary + one secondary Button. For a plain yes/no, reach for `ConfirmDialog` instead of hand-rolling the footer.",
       "props": [
         {
           "name": "open",
@@ -1671,7 +2342,7 @@
           "type": "(() => void) | undefined",
           "required": false,
           "defaultValue": null,
-          "description": ""
+          "description": "Fires on Escape (when topmost), scrim click, and nothing else."
         },
         {
           "name": "title",
@@ -1700,6 +2371,48 @@
           "required": false,
           "defaultValue": "default",
           "description": ""
+        },
+        {
+          "name": "closeOnEscape",
+          "type": "boolean | undefined",
+          "required": false,
+          "defaultValue": "true",
+          "description": "`false` keeps the dialog open on Escape (it still swallows the key)."
+        },
+        {
+          "name": "closeOnOverlayClick",
+          "type": "boolean | undefined",
+          "required": false,
+          "defaultValue": "true",
+          "description": "`false` keeps the dialog open when the scrim is clicked."
+        },
+        {
+          "name": "portal",
+          "type": "boolean | undefined",
+          "required": false,
+          "defaultValue": "true",
+          "description": "`false` renders in place in the React tree instead of a portal."
+        },
+        {
+          "name": "container",
+          "type": "Element | DocumentFragment | null | undefined",
+          "required": false,
+          "defaultValue": null,
+          "description": "Portal target. Defaults to `document.body`."
+        },
+        {
+          "name": "lockScroll",
+          "type": "boolean | undefined",
+          "required": false,
+          "defaultValue": "true",
+          "description": "`false` leaves `document.body` scrollable while the dialog is open."
+        },
+        {
+          "name": "initialFocus",
+          "type": "RefObject<HTMLElement | null> | undefined",
+          "required": false,
+          "defaultValue": null,
+          "description": "Element to focus on open. Defaults to the first focusable child."
         },
         {
           "name": "className",
@@ -1770,7 +2483,7 @@
       "props": [
         {
           "name": "variant",
-          "type": "\"default\" | \"success\" | \"info\" | \"warning\" | \"error\" | undefined",
+          "type": "ToastVariant | undefined",
           "required": false,
           "defaultValue": "default",
           "description": ""
@@ -1797,6 +2510,20 @@
           "description": ""
         },
         {
+          "name": "role",
+          "type": "\"alert\" | \"status\" | undefined",
+          "required": false,
+          "defaultValue": null,
+          "description": "ARIA role. Derived from `variant` when omitted: `'alert'` for `error`,\n`'status'` otherwise. Override to force one either way."
+        },
+        {
+          "name": "aria-live",
+          "type": "\"off\" | \"assertive\" | \"polite\" | undefined",
+          "required": false,
+          "defaultValue": null,
+          "description": "Live-region politeness. Derived from `variant` when omitted: `'assertive'`\nfor `error`, `'polite'` otherwise. Override to force one either way."
+        },
+        {
           "name": "className",
           "type": "string | undefined",
           "required": false,
@@ -1809,6 +2536,50 @@
           "required": false,
           "defaultValue": null,
           "description": ""
+        }
+      ]
+    },
+    {
+      "slug": "toaster",
+      "name": "Toaster",
+      "category": "overlays",
+      "docs": "/components/toaster",
+      "summary": "The host that actually shows toasts — mount `<Toaster />` once near the app root, then fire `toast()` from anywhere (event handlers, API layers, non-React code). Do not hand-roll a container: a hook that owns its own state gives every caller a separate queue, and toasts fired from a screen whose container nothing renders are silently dropped.",
+      "props": [
+        {
+          "name": "position",
+          "type": "ToasterPosition | undefined",
+          "required": false,
+          "defaultValue": "bottom-right",
+          "description": "Corner or edge to pin the stack to. Default `'bottom-right'`."
+        },
+        {
+          "name": "max",
+          "type": "number | undefined",
+          "required": false,
+          "defaultValue": "3",
+          "description": "Most toasts shown at once; the rest collapse into a `+N more` count. `0` shows all. Default `3`."
+        },
+        {
+          "name": "gap",
+          "type": "number | undefined",
+          "required": false,
+          "defaultValue": "10",
+          "description": "Space between stacked toasts, in px. Default `10`."
+        },
+        {
+          "name": "duration",
+          "type": "number | undefined",
+          "required": false,
+          "defaultValue": "5000",
+          "description": "Default auto-dismiss in ms for toasts that don't set their own. Default `5000`."
+        },
+        {
+          "name": "container",
+          "type": "HTMLElement | null | undefined",
+          "required": false,
+          "defaultValue": null,
+          "description": "Portal target. Defaults to `document.body`."
         }
       ]
     },

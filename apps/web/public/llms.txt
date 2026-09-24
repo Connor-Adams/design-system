@@ -1,28 +1,31 @@
 # Cashflow Design System
 
-> React component library (@connor-adams/designsystem). 45 components across 7 categories. All components are imported from the package root.
+> React component library (@connor-adams/designsystem). 52 components across 7 categories. All components are imported from the package root.
 
 Full inventory with prop schemas: /components.json
 
 ## Core
 - [Accordion](/components/accordion): A disclosure stack for FAQs, settings groups, and statement breakdowns. Props: items, type, defaultValue, collapsible.
 - [Avatar](/components/avatar): A circular person avatar (account holder, shared-ledger member) with an initials fallback when the image is missing. Props: src, name, size, status, ring.
-- [Badge](/components/badge): Small pill for status, category, and counts — `default` is oxblood brand fill, `secondary` the neutral workhorse. Props: variant.
+- [Badge](/components/badge): Small pill for status, category, and counts — `default` is oxblood brand fill, `secondary` the neutral workhorse, and `dot`/`pulse` turn it into a live status indicator. Props: variant, size, dot, pulse.
 - [Button](/components/button): Cashflow's action button — solid oxblood `primary` for the main CTA, neutral variants for the rest, tinted `destructive` for deletes. Props: variant, size.
-- [Card](/components/card): The default raised surface — white card, hairline border, light shadow, rounded-lg. Everything sits in one.
+- [Card](/components/card): The default raised surface — white card, hairline border, light shadow, rounded-lg. Everything sits in one. Configurable enough that you should never hand-roll a panel/section div. Props: variant, padding, radius.
 - [Icon](/components/icon): Stroke glyph from the built-in registry — lucide-style, renders in `currentColor`, sized by the `size` prop. Props: name, size, strokeWidth, brand, title.
 - [Kbd](/components/kbd): A keycap for documenting shortcuts in menus, tooltips, and command hints.
 - [Link](/components/link): An inline anchor for body copy and table cells. Defaults to the oxblood-leaning `--text-link`; underline appears on hover only. Props: muted, subtle, external.
-- [Progress](/components/progress): A determinate bar for budgets, savings goals, and import progress. Use `tone` to signal state (e.g. `danger` when a category is over budget). Props: value, tone, size, indeterminate, label, showValue.
+- [Progress](/components/progress): A determinate bar for budgets, savings goals, import progress, and playback. Use `tone` to signal state (e.g. `danger` when a category is over budget), `valueText` when a percentage is the wrong readout, and `segments` for a stacked bar. Props: value, tone, size, indeterminate, label, showValue, valueText, segments.
 - [Separator](/components/separator): A hairline rule to separate sections, list rows, or inline metadata. Props: orientation, label.
 - [Spinner](/components/spinner): An indeterminate loading ring for buttons, inline fetches, and empty panels. Inside a Button it inherits the label color via `tone="current"`. Props: size, tone, label.
 - [Text](/components/text): The single typography primitive — use it for every piece of text instead of bare tags so the type scale and token colors stay consistent. `variant` sets the scale step and a default tag; `as` overrides the tag. Props: variant, as, tone, weight, mono, align, truncate.
 
 ## Data
+- [ChartFrame](/components/chart-frame): ChartFrame component. Props: title, subtitle, actions, footer, height, rowCount, rowHeight, minHeight, maxHeight, padding.
+- [DataTable](/components/data-table): DataTable component. Props: columns, rows, getRowKey, sort, onSortChange, empty, loading, loadingRows, maxHeight, containerClassName.
 - [LetterAvatar](/components/letter-avatar): LetterAvatar component. Props: text, size.
-- [StatCard](/components/stat-card): StatCard component. Props: label, value, hint, delta, metricKind.
-- [Table](/components/table): Table component. Props: maxHeight.
-- [Tabs](/components/tabs): Tabs component. Props: items, value, onValueChange.
+- [StatCard](/components/stat-card): StatCard component. Props: label, value, hint, delta, metricKind, bare.
+- [StatGrid](/components/stat-grid): StatGrid component. Props: columns, minItemWidth, gap, divided.
+- [Table](/components/table): Table component. Props: maxHeight, containerClassName.
+- [Tabs](/components/tabs): Tabs component. Props: items, value, onValueChange, overflow.
 
 ## Feedback
 - [Alert](/components/alert): Alert component. Props: variant, title, action.
@@ -35,30 +38,34 @@ Full inventory with prop schemas: /components.json
 - [BudgetMeter](/components/budget-meter): A budget-vs-spend row for the budgets screen and category drill-downs. The bar self-colors: green under budget, amber near the limit, oxblood over. Props: label, spent, limit, currency, locale, warnAt.
 - [CategoryBreakdown](/components/category-breakdown): A card that ranks money by category as horizontal bars — the "net spend by category" tile. Props: rows, title, subtitle, trend, trendTone, max, currency, locale, iconOverrides, onSelect.
 - [CategoryPill](/components/category-pill): The category chip for transaction rows, filters, and budgets — icon + label with a per-category tint, drawn from a built-in icon set. Props: category, label, icon, iconName, overrides, color, interactive, size.
-- [ImportDropzone](/components/import-dropzone): The statement-import target for the import flow — drag-and-drop or click-to-browse a CSV/OFX file. Props: accept, onFile, hint.
+- [ImportDropzone](/components/import-dropzone): A drag-and-drop file intake surface — drop or click-to-browse. Defaults to the statement-import wording, but every piece of copy is a slot, so it works for receipts, exports or audio too. Props: accept, multiple, maxSize, onFile, onFiles, onError, hint, label, children, replaceLabel, files, disabled.
 - [MoneyInput](/components/money-input): A currency amount field for adding/editing transactions and setting budgets. Pass `direction` + `onDirectionChange` to show the in/out toggle. Props: value, defaultValue, onValueChange, currency, locale, direction, onDirectionChange, disabled, invalid, size, placeholder.
 - [PeriodSelector](/components/period-selector): The date-range control every ledger view needs — preset periods with an optional custom range, in a compact popover. Props: value, onValueChange, custom, onCustomChange, presets, size.
 - [Sparkline](/components/sparkline): A tiny trend line to sit beside a balance or inside a StatCard — green when the series rises, oxblood when it falls. Props: data, width, height, tone, area, dot, strokeWidth.
 
 ## Forms
 - [Checkbox](/components/checkbox): A square checkbox for multi-select and form opt-ins (select transactions, terms). Use `indeterminate` on a header checkbox when some but not all rows are selected. Props: checked, defaultChecked, onCheckedChange, indeterminate.
-- [Combobox](/components/combobox): A searchable single-select for long option lists (assign a category, pick a payee, choose an account). For a handful of fixed options use NativeSelect. Props: options, value, defaultValue, onValueChange, placeholder, emptyText, size.
-- [Input](/components/input): Input component. Props: invalid.
+- [Combobox](/components/combobox): A searchable single-select for long option lists (assign a category, pick a payee, choose an account). For a handful of fixed options use NativeSelect. Props: options, value, defaultValue, onValueChange, placeholder, emptyText, name, size.
+- [Field](/components/field): Field component. Props: label, hint, error, required, id.
+- [Input](/components/input): Input component. Props: invalid, leadingIcon, trailingIcon, clearable, onClear, clearLabel.
 - [Label](/components/label): Label component.
 - [NativeSelect](/components/native-select): NativeSelect component. Props: size, options.
 - [RadioGroup](/components/radio-group): A single-choice radio group for mutually-exclusive options (account type, statement period). Exported as `RadioGroup`. Props: options, value, defaultValue, onValueChange, name, orientation, disabled.
-- [Slider](/components/slider): A single-value range control for budgets, thresholds, and filters (e.g. "alert when a transaction exceeds $X"). Props: min, max, step, value, defaultValue, onValueChange, disabled, showValue, format.
+- [Slider](/components/slider): A single-value range control for budgets, thresholds, and filters (e.g. "alert when a transaction exceeds $X"). Props: min, max, step, value, defaultValue, onValueChange, name, disabled, showValue, format.
 - [Stepper](/components/stepper): A compact numeric input for small bounded quantities (split count, reminder days, statement months back). Props: value, defaultValue, onValueChange, min, max, step, disabled, size, format.
 - [Switch](/components/switch): A pill toggle for on/off settings (notifications, auto-reconcile) — oxblood when on. Use over Checkbox for instant-apply settings, not form submission. Props: checked, defaultChecked, onCheckedChange, size.
 - [Textarea](/components/textarea): Textarea component. Props: invalid.
 - [ToggleGroup](/components/toggle-group): A segmented control for switching between a few mutually-exclusive views (timeframe, chart type, account filter). For navigation between content panels prefer Tabs; use this for filters and settings. Props: items, type, value, defaultValue, onValueChange, size.
+- [UploadButton](/components/upload-button): A file picker that looks like a Button — use it anywhere the app needs "pick a file" without hand-rolling a hidden `<input type="file">` and a proxy button. Props: accept, multiple, maxSize, onFiles, onError, loading, variant, size, icon, loadingLabel, inputRef, inputProps.
 
 ## Navigation
 - [Breadcrumb](/components/breadcrumb): A path trail for nested views (Accounts › Amex Cobalt › Statements). Props: items.
 - [Pagination](/components/pagination): Page navigation for long transaction lists and search results. Props: page, pageCount, onPageChange, siblingCount.
 
 ## Overlays
-- [Dialog](/components/dialog): A modal for confirmations and short forms (delete transaction, edit category, add account). Keep the footer to one primary + one secondary Button. Props: open, onClose, title, description, footer, size, className, style.
+- [ConfirmDialog](/components/confirm-dialog): The `window.confirm` replacement: an `alertdialog` with a title, one consequence line, and exactly two buttons. Reach for it before any destructive action (delete transaction, remove account, merge categories). Built on `Dialog`, so it inherits the focus trap, focus restore, dismiss stack and scroll lock. Props: open, title, description, confirmLabel, cancelLabel, tone, onConfirm, onCancel, onClose, onError, pending, size, closeOnEscape, closeOnOverlayClick, portal, container, lockScroll, className, style, children.
+- [Dialog](/components/dialog): A modal for confirmations and short forms (delete transaction, edit category, add account). Keep the footer to one primary + one secondary Button. For a plain yes/no, reach for `ConfirmDialog` instead of hand-rolling the footer. Props: open, onClose, title, description, footer, size, closeOnEscape, closeOnOverlayClick, portal, container, lockScroll, initialFocus, className, style.
 - [DropdownMenu](/components/dropdown-menu): A row/overflow action menu (the ⋯ on a transaction, account, or report). Use `danger` for delete and a `separator` to group destructive actions. Props: trigger, items, align, className, style.
-- [Toast](/components/toast): A transient confirmation that floats bottom-right (transaction saved, statement imported, sync failed). Auto-dismiss after a few seconds; keep copy to one line. Props: variant, title, action, onClose, className, style.
+- [Toast](/components/toast): A transient confirmation that floats bottom-right (transaction saved, statement imported, sync failed). Auto-dismiss after a few seconds; keep copy to one line. Props: variant, title, action, onClose, role, aria-live, className, style.
+- [Toaster](/components/toaster): The host that actually shows toasts — mount `<Toaster />` once near the app root, then fire `toast()` from anywhere (event handlers, API layers, non-React code). Do not hand-roll a container: a hook that owns its own state gives every caller a separate queue, and toasts fired from a screen whose container nothing renders are silently dropped. Props: position, max, gap, duration, container.
 - [Tooltip](/components/tooltip): A small hover/focus hint for icon buttons and truncated values (full merchant name, exact timestamp). Keep content to a few words — never essential-only info. Props: content, side, className, style.
