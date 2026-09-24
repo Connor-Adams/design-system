@@ -1,4 +1,4 @@
-<!-- @dsCard group="Finance" viewport="700x260" name="ImportDropzone" subtitle="Statement import — drag-drop or browse" -->
+<!-- @dsCard group="Finance" viewport="700x460" name="ImportDropzone" subtitle="File intake — drag-drop or browse, slotted copy" -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -19,12 +19,37 @@
 <body>
 <div id="root"></div>
 <script type="text/babel">
-  const { ImportDropzone } = window.CashflowDesignSystem_2cf89d;
+  const { ImportDropzone, Text } = window.CashflowDesignSystem_2cf89d;
   function Demo() {
-    
+    const [statements, setStatements] = React.useState(null);
     return (
       <div className="wrap" style={{ maxWidth: 440 }}>
-        <ImportDropzone onFile={() => {}} />
+        <div>
+          <p className="cap">Statements — default copy, 10MB limit, controlled</p>
+          <ImportDropzone
+            accept=".csv,.ofx,.qfx"
+            maxSize={10 * 1e6}
+            files={statements}
+            onFiles={setStatements}
+          />
+          {statements && statements.length ? (
+            <div style={{ marginTop: 8 }}>
+              <Text variant="body-sm" tone="muted">
+                Selected {statements[0].name} — <a href="#" onClick={(e) => { e.preventDefault(); setStatements([]); }}>clear</a>
+              </Text>
+            </div>
+          ) : null}
+        </div>
+        <div>
+          <p className="cap">Receipts — slotted copy, multiple</p>
+          <ImportDropzone
+            multiple
+            accept="image/*,.pdf"
+            label="Drop receipts, or browse"
+            hint="PNG, JPG or PDF · any number"
+            replaceLabel="click to change"
+          />
+        </div>
       </div>
     );
   }
