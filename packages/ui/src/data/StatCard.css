@@ -13,6 +13,15 @@
   font-family: var(--font-sans);
 }
 
+/* bare — something else draws the container (a `StatGrid divided` strip, or a
+   Card the tile sits inside), so drop the shell and keep only the padding. */
+.ca-stat-card[data-bare='true'] {
+  border-color: transparent;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
 .ca-stat-card__label {
   margin: 0;
   font-size: var(--text-label);

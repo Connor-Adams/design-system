@@ -1,0 +1,49 @@
+<!-- @dsCard group="Components" viewport="700x430" name="StatGrid" subtitle="The KPI row container — auto-fit, fixed columns, divided strip" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="../../styles.css" />
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script>
+<style>
+  body { margin: 0; padding: 20px; background: var(--card); font-family: var(--font-sans); }
+  .wrap { display: flex; flex-direction: column; gap: 18px; }
+  .cap { font-size: var(--text-label); text-transform: uppercase; letter-spacing: .06em; font-weight: 600; color: var(--muted-foreground); margin: 0 0 8px; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+  const { StatCard, StatGrid } = window.CashflowDesignSystem_2cf89d;
+  const TILES = [
+    { label: 'Net spend',    value: '$4,210', hint: 'This month',      delta: '-8%',  metricKind: 'spend' },
+    { label: 'Income',       value: '$9,800', hint: 'vs last month',   delta: '+3%',  metricKind: 'gain' },
+    { label: 'Net savings',  value: '$2,180', hint: 'After expenses',  delta: '+12%', metricKind: 'gain' },
+    { label: 'Transactions', value: '312',    hint: 'Current filters', delta: '+24',  metricKind: 'neutral' },
+  ];
+  function Demo() {
+    return (
+      <div className="wrap">
+        <div>
+          <p className="cap">columns="auto" · minItemWidth 180 · gap md</p>
+          <StatGrid>
+            {TILES.map((t) => <StatCard key={t.label} {...t} />)}
+          </StatGrid>
+        </div>
+        <div>
+          <p className="cap">columns={4} · divided — hairlines, no gutters</p>
+          <StatGrid columns={4} divided>
+            {TILES.map((t) => <StatCard key={t.label} {...t} />)}
+          </StatGrid>
+        </div>
+      </div>
+    );
+  }
+  ReactDOM.createRoot(document.getElementById('root')).render(<Demo />);
+</script>
+</body>
+</html>

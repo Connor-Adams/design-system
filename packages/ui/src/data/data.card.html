@@ -12,13 +12,12 @@
 <style>
   body { margin: 0; padding: 20px; background: var(--card); }
   .grid { display: flex; flex-direction: column; gap: 16px; }
-  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
 </style>
 </head>
 <body>
 <div id="root"></div>
 <script type="text/babel">
-  const { StatCard, Table, TableHeader, TableBody, TableRow, TableHead, TableCell, Tabs, LetterAvatar, Badge } = window.CashflowDesignSystem_2cf89d;
+  const { StatCard, StatGrid, Table, TableHeader, TableBody, TableRow, TableHead, TableCell, Tabs, LetterAvatar, Badge } = window.CashflowDesignSystem_2cf89d;
   function Demo() {
     const [tab, setTab] = React.useState('all');
     const rows = [
@@ -28,11 +27,11 @@
     ];
     return (
       <div className="grid">
-        <div className="stats">
+        <StatGrid columns={3}>
           <StatCard label="Net spend" value="$4,210" hint="This month" delta="-8%" metricKind="spend" />
           <StatCard label="Income" value="$9,800" hint="vs last month" delta="+3%" metricKind="gain" />
           <StatCard label="Transactions" value="312" hint="In current filters" delta="+24" metricKind="neutral" />
-        </div>
+        </StatGrid>
         <Tabs items={[{value:'all',label:'All'},{value:'biz',label:'Business'},{value:'personal',label:'Personal'}]} value={tab} onValueChange={setTab} />
         <Table>
           <TableHeader>
