@@ -1,4 +1,4 @@
-<!-- @dsCard group="Components" viewport="700x360" name="Data — StatCard, Table, Tabs, Avatar" subtitle="Money-aware KPIs and the data table" -->
+<!-- @dsCard group="Components" viewport="700x810" name="Data — StatCard, StatGrid, ChartFrame, Table, Tabs, Avatar" subtitle="Money-aware KPIs in a grid, the chart frame, the data table, and the scrolling tablist" -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,15 +12,33 @@
 <style>
   body { margin: 0; padding: 20px; background: var(--card); }
   .grid { display: flex; flex-direction: column; gap: 16px; }
-  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
 </style>
 </head>
 <body>
 <div id="root"></div>
 <script type="text/babel">
-  const { StatCard, Table, TableHeader, TableBody, TableRow, TableHead, TableCell, Tabs, LetterAvatar, Badge } = window.CashflowDesignSystem_2cf89d;
+  const { StatCard, StatGrid, ChartFrame, Table, TableHeader, TableBody, TableRow, TableHead, TableCell, Tabs, LetterAvatar, Badge, Button, chartColor, chartTheme } = window.CashflowDesignSystem_2cf89d;
+
+  // Stand-in for the consuming app's chart — ChartFrame never depends on a
+  // charting library. The bars read the palette export, and because every
+  // value is a var(--chart-N) string (which resolves in an SVG presentation
+  // attribute) they follow the theme and the data-brand scope with no JS.
+  function FakeBars({ count = 10 }) {
+    const values = Array.from({ length: count }, (_, i) => 28 + ((i * 37) % 66));
+    return (
+      <svg width="100%" height="100%" viewBox={`0 0 ${count * 40} 100`} preserveAspectRatio="none">
+        {values.map((v, i) => (
+          <rect key={i} x={i * 40 + 8} y={100 - v} width={24} height={v} rx={2} fill={chartColor(i)} />
+        ))}
+        <line x1="0" y1="99.5" x2={count * 40} y2="99.5" stroke={chartTheme.axis.stroke} />
+      </svg>
+    );
+  }
   function Demo() {
     const [tab, setTab] = React.useState('all');
+    const [stat, setStat] = React.useState('summary');
+    const statTabs = ['Summary','Commands','Sounds','Users','Guilds','Queue','Time Trends','History','Sessions','Performance']
+      .map((label) => ({ value: label.toLowerCase().replace(/ /g,'-'), label }));
     const rows = [
       ['Whole Foods Market','Amex Cobalt','Groceries','-$84.20','negative'],
       ['Payroll · Acme Inc','TD Chequing','Income','+$4,900.00','positive'],
@@ -28,12 +46,25 @@
     ];
     return (
       <div className="grid">
-        <div className="stats">
+        <StatGrid columns={3}>
           <StatCard label="Net spend" value="$4,210" hint="This month" delta="-8%" metricKind="spend" />
           <StatCard label="Income" value="$9,800" hint="vs last month" delta="+3%" metricKind="gain" />
           <StatCard label="Transactions" value="312" hint="In current filters" delta="+24" metricKind="neutral" />
-        </div>
+        </StatGrid>
+        <ChartFrame
+          title="Spend by month"
+          subtitle="Last 12 months, all accounts"
+          height={220}
+          actions={<><Badge variant="secondary">Monthly</Badge><Button variant="ghost" size="sm">Export</Button></>}
+          footer="Source: imported ledger"
+        >
+          <FakeBars count={12} />
+        </ChartFrame>
         <Tabs items={[{value:'all',label:'All'},{value:'biz',label:'Business'},{value:'personal',label:'Personal'}]} value={tab} onValueChange={setTab} />
+        {/* overflow="scroll": one row, faded edges, arrow keys drag the scroll along */}
+        <div style={{ maxWidth: 360 }}>
+          <Tabs items={statTabs} value={stat} onValueChange={setStat} overflow="scroll" />
+        </div>
         <Table>
           <TableHeader>
             <TableRow>

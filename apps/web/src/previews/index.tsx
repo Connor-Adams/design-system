@@ -15,8 +15,13 @@ import {
   Spinner,
   Text,
   // data
+  DataTable,
+  type DataTableColumn,
+  type DataTableSort,
+  ChartFrame,
   LetterAvatar,
   StatCard,
+  StatGrid,
   Table, TableHeader, TableBody, TableRow, TableHead, TableCell,
   Tabs,
   // feedback
@@ -36,6 +41,7 @@ import {
   // forms
   Checkbox,
   Combobox,
+  Field,
   Input,
   Label,
   NativeSelect,
@@ -45,20 +51,126 @@ import {
   Switch,
   Textarea,
   ToggleGroup,
+  UploadButton,
   // navigation
   Breadcrumb,
   Pagination,
   // overlays
+  ConfirmDialog,
   Dialog,
   DropdownMenu,
   Toast,
+  Toaster,
+  toast,
+  useToast,
   Tooltip,
+  useConfirm,
+  // chart palette (also published CSS-free at '@connor-adams/designsystem/chart')
+  chartColor,
+  chartColors,
+  chartTheme,
 } from '@connor-adams/designsystem'
 
 // ---------------------------------------------------------------------------
 // Controlled wrappers — defined as named function components so hooks are valid
 // (module is already 'use client')
 // ---------------------------------------------------------------------------
+
+function UseConfirmPreview(): React.JSX.Element {
+  const { confirm, dialog } = useConfirm({ tone: 'destructive', confirmLabel: 'Delete' })
+  const [answer, setAnswer] = React.useState('—')
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+      <Button
+        variant="destructive"
+        onClick={async () => {
+          const ok = await confirm({
+            title: 'Delete sound?',
+            description: 'The clip and its soundboard button are removed.',
+          })
+          setAnswer(ok ? 'confirmed' : 'cancelled')
+        }}
+      >
+        Delete sound
+      </Button>
+      <span style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-body-sm)' }}>Last answer: {answer}</span>
+      {dialog}
+    </div>
+  )
+}
+
+interface PreviewTxn {
+  id: string
+  date: string
+  merchant: string
+  amount: number
+}
+
+const previewTxns: PreviewTxn[] = [
+  { id: 'p1', date: 'Jun 15', merchant: 'Whole Foods Market', amount: -94.32 },
+  { id: 'p2', date: 'Jun 14', merchant: 'Acme Corp Payroll', amount: 4250 },
+  { id: 'p3', date: 'Jun 13', merchant: 'Netflix Subscription', amount: -18.99 },
+]
+
+const previewMoney = (n: number): string =>
+  `${n < 0 ? '\u2212' : '+'}$${Math.abs(n).toFixed(2)}`
+
+const previewColumns: DataTableColumn<PreviewTxn>[] = [
+  { key: 'date', header: 'Date', width: 90, sortable: true },
+  { key: 'merchant', header: 'Merchant', sortable: true },
+  {
+    key: 'amount',
+    header: 'Amount',
+    align: 'right',
+    width: 120,
+    sortable: true,
+    render: (t) => (
+      <span style={{ fontWeight: 600, color: t.amount < 0 ? 'var(--negative)' : 'var(--positive)' }}>
+        {previewMoney(t.amount)}
+      </span>
+    ),
+  },
+]
+
+function DataTablePreview(): React.JSX.Element {
+  const [sort, setSort] = React.useState<DataTableSort | null>({ key: 'amount', direction: 'desc' })
+  const rows = React.useMemo(() => {
+    if (!sort) return previewTxns
+    const dir = sort.direction === 'asc' ? 1 : -1
+    return [...previewTxns].sort((a, b) => {
+      const x = a[sort.key as keyof PreviewTxn]
+      const y = b[sort.key as keyof PreviewTxn]
+      if (typeof x === 'number' && typeof y === 'number') return (x - y) * dir
+      return String(x).localeCompare(String(y)) * dir
+    })
+  }, [sort])
+  return (
+    <DataTable
+      columns={previewColumns}
+      rows={rows}
+      getRowKey={(t) => t.id}
+      sort={sort}
+      onSortChange={setSort}
+      aria-label="Recent transactions"
+    />
+  )
+}
+
+// Stand-in for a consuming app's chart. ChartFrame is chart-library agnostic —
+// packages/ui takes no npm deps — so the gallery draws plain SVG whose fills
+// come from the palette export. `var(--chart-N)` resolves in an SVG
+// presentation attribute, so these bars follow the theme with no JS.
+function FakeBars({ count = 10 }: { count?: number }): React.JSX.Element {
+  const values = Array.from({ length: count }, (_, i) => 28 + ((i * 37) % 66))
+  return (
+    <svg width="100%" height="100%" viewBox={`0 0 ${count * 40} 100`} preserveAspectRatio="none">
+      {values.map((v, i) => (
+        <rect key={i} x={i * 40 + 8} y={100 - v} width={24} height={v} rx={2} fill={chartColor(i)} />
+      ))}
+      <line x1="0" y1="99.5" x2={count * 40} y2="99.5" stroke={chartTheme.axis.stroke} />
+    </svg>
+  )
+}
 
 function TabsPreview(): React.JSX.Element {
   const [value, setValue] = React.useState('month')
@@ -76,6 +188,128 @@ function TabsPreview(): React.JSX.Element {
   )
 }
 
+function ToasterPreview(): React.JSX.Element {
+  // The Toaster portals to document.body by default; point `container` at this
+  // cell (and give it a containing block) so the fixed stack stays in the gallery.
+  const [stage, setStage] = React.useState<HTMLDivElement | null>(null)
+  const { toasts } = useToast()
+  const btn: React.CSSProperties = {
+    padding: '6px 12px',
+    border: '1px solid var(--border)',
+    borderRadius: 'var(--radius-md)',
+    background: 'var(--card)',
+    color: 'var(--foreground)',
+    font: 'inherit',
+    cursor: 'pointer',
+  }
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+        <button
+          type="button"
+          style={btn}
+          onClick={() => toast.success('Statement imported', { description: '312 transactions added.' })}
+        >
+          Success
+        </button>
+        <button
+          type="button"
+          style={btn}
+          onClick={() => toast.error('Sync failed', { description: 'Couldn\u2019t reach TD. We\u2019ll retry shortly.' })}
+        >
+          Error
+        </button>
+        <button
+          type="button"
+          style={btn}
+          onClick={() => toast({ title: 'Transaction deleted', duration: Infinity })}
+        >
+          Persistent
+        </button>
+        <button type="button" style={btn} onClick={() => toast.dismiss()}>
+          Dismiss all
+        </button>
+      </div>
+      <div
+        ref={setStage}
+        style={{
+          position: 'relative',
+          height: 200,
+          overflow: 'hidden',
+          border: '1px dashed var(--border)',
+          borderRadius: 'var(--radius-md)',
+          transform: 'translateZ(0)',
+        }}
+      >
+        {stage && <Toaster position="bottom-right" max={3} container={stage} />}
+      </div>
+      <p style={{ margin: 0, fontSize: 'var(--text-body-sm)', color: 'var(--muted-foreground)' }}>
+        Queue length: {toasts.length}. One host, one module-level store — <code>toast()</code> works from anywhere.
+      </p>
+    </div>
+  )
+}
+
+const MANY_TAB_ITEMS = [
+  'Summary',
+  'Commands',
+  'Sounds',
+  'Users',
+  'Guilds',
+  'Queue',
+  'Time Trends',
+  'History',
+  'Sessions',
+  'Performance',
+  'Errors',
+  'Retention',
+].map((label) => ({ value: label.toLowerCase().replace(/ /g, '-'), label }))
+
+/** Default overflow: a long bar wraps onto several rows. */
+function TabsWrapPreview(): React.JSX.Element {
+  const [value, setValue] = React.useState('summary')
+  return (
+    <div style={{ maxWidth: 360 }}>
+      <Tabs items={MANY_TAB_ITEMS} value={value} onValueChange={setValue} />
+    </div>
+  )
+}
+
+/** overflow="scroll": one row, faded edges, selection scrolled into view. */
+function TabsScrollPreview(): React.JSX.Element {
+  const [value, setValue] = React.useState('summary')
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 10, maxWidth: 360 }}>
+      <Tabs items={MANY_TAB_ITEMS} value={value} onValueChange={setValue} overflow="scroll" />
+      <button
+        type="button"
+        onClick={() => setValue(value === 'retention' ? 'summary' : 'retention')}
+        style={{ alignSelf: 'flex-start', font: 'inherit', cursor: 'pointer' }}
+      >
+        Jump to {value === 'retention' ? 'first' : 'last'} tab
+      </button>
+    </div>
+  )
+}
+
+/** Panels belong to the consumer — panelId/tabId wire the ARIA relationship. */
+function TabsWithPanelPreview(): React.JSX.Element {
+  const [value, setValue] = React.useState('all')
+  const items = [
+    { value: 'all', label: 'All', tabId: 'ca-preview-tab-all', panelId: 'ca-preview-panel-all' },
+    { value: 'biz', label: 'Business', tabId: 'ca-preview-tab-biz', panelId: 'ca-preview-panel-biz' },
+  ]
+  const active = items.find((item) => item.value === value)
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+      <Tabs items={items} value={value} onValueChange={setValue} />
+      <div id={active?.panelId} role="tabpanel" aria-labelledby={active?.tabId} tabIndex={0}>
+        Showing <strong>{value}</strong> transactions.
+      </div>
+    </div>
+  )
+}
+
 function PeriodSelectorPreview(): React.JSX.Element {
   const [value, setValue] = React.useState('this-month')
   return <PeriodSelector value={value} onValueChange={setValue} />
@@ -85,6 +319,68 @@ function PaginationPreview(): React.JSX.Element {
   const [page, setPage] = React.useState(3)
   return <Pagination page={page} pageCount={10} onPageChange={setPage} siblingCount={1} />
 }
+
+function UploadButtonPreview(): React.JSX.Element {
+  const [picked, setPicked] = React.useState<string[]>([])
+  const [error, setError] = React.useState('')
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+      <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
+        <UploadButton
+          accept=".csv,.ofx,.qfx"
+          maxSize={10 * 1e6}
+          onFiles={(files) => {
+            setError('')
+            setPicked(files.map((f) => f.name))
+          }}
+          onError={(rejections) => setError(rejections[0]?.message ?? '')}
+        >
+          Import statement
+        </UploadButton>
+        <Text variant="body-sm" tone="muted">
+          {picked.length > 0 ? picked.join(', ') : 'Nothing picked yet'}
+        </Text>
+      </div>
+      {error ? (
+        <Text variant="body-sm" tone="negative">
+          {error}
+        </Text>
+      ) : null}
+    </div>
+  )
+}
+
+function ImportDropzonePreview(): React.JSX.Element {
+  const [files, setFiles] = React.useState<File[]>([])
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+      <ImportDropzone files={files} onFiles={setFiles} maxSize={10 * 1e6} />
+      <div>
+        <Button variant="ghost" size="sm" disabled={files.length === 0} onClick={() => setFiles([])}>
+          Clear selection
+        </Button>
+      </div>
+    </div>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// Adornment glyphs — Input takes icons as nodes, so the gallery supplies its own
+// ---------------------------------------------------------------------------
+
+const SearchGlyph = (
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
+    <circle cx="11" cy="11" r="7" />
+    <path d="m21 21-4.3-4.3" />
+  </svg>
+)
+
+const LockGlyph = (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
+    <rect x="4" y="11" width="16" height="10" rx="2" />
+    <path d="M8 11V7a4 4 0 0 1 8 0v4" />
+  </svg>
+)
 
 // ---------------------------------------------------------------------------
 // Variant type
@@ -128,9 +424,68 @@ export const previews: Record<string, Variant[]> = {
         <Badge>Default</Badge>
         <Badge variant="secondary">Secondary</Badge>
         <Badge variant="success">Paid</Badge>
+        <Badge variant="warning">Due soon</Badge>
+        <Badge variant="info">Heads up</Badge>
         <Badge variant="destructive">Overdue</Badge>
         <Badge variant="outline">Pending</Badge>
         <Badge variant="count">12</Badge>
+      </div>
+    )},
+    { label: 'Sizes', node: (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+          <Badge size="default">Default</Badge>
+          <Badge size="default" variant="secondary">Secondary</Badge>
+          <Badge size="default" variant="success">Paid</Badge>
+          <Badge size="default" variant="warning">Due soon</Badge>
+          <Badge size="default" variant="info">Heads up</Badge>
+          <Badge size="default" variant="destructive">Overdue</Badge>
+          <Badge size="default" variant="outline">Pending</Badge>
+          <Badge size="default" variant="count">12</Badge>
+        </div>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+          <Badge size="sm">Default</Badge>
+          <Badge size="sm" variant="secondary">Secondary</Badge>
+          <Badge size="sm" variant="success">Paid</Badge>
+          <Badge size="sm" variant="warning">Due soon</Badge>
+          <Badge size="sm" variant="info">Heads up</Badge>
+          <Badge size="sm" variant="destructive">Overdue</Badge>
+          <Badge size="sm" variant="outline">Pending</Badge>
+          <Badge size="sm" variant="count">12</Badge>
+        </div>
+      </div>
+    )},
+    { label: 'Status dot', node: (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+          <Badge dot>Default</Badge>
+          <Badge variant="secondary" dot>Secondary</Badge>
+          <Badge variant="success" dot>Connected</Badge>
+          <Badge variant="warning" dot>Degraded</Badge>
+          <Badge variant="info" dot>Streaming</Badge>
+          <Badge variant="destructive" dot>Down</Badge>
+          <Badge variant="outline" dot>Idle</Badge>
+          <Badge variant="count" dot>12</Badge>
+        </div>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+          <Badge size="sm" dot>Default</Badge>
+          <Badge size="sm" variant="secondary" dot>Secondary</Badge>
+          <Badge size="sm" variant="success" dot>Connected</Badge>
+          <Badge size="sm" variant="warning" dot>Degraded</Badge>
+          <Badge size="sm" variant="info" dot>Streaming</Badge>
+          <Badge size="sm" variant="destructive" dot>Down</Badge>
+          <Badge size="sm" variant="outline" dot>Idle</Badge>
+          <Badge size="sm" variant="count" dot>12</Badge>
+        </div>
+      </div>
+    )},
+    { label: 'Pulse', node: (
+      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+        <Badge variant="success" pulse>Live</Badge>
+        <Badge variant="warning" pulse>Syncing</Badge>
+        <Badge variant="info" pulse>Streaming</Badge>
+        <Badge variant="destructive" pulse>Disconnected</Badge>
+        <Badge variant="success" size="sm" pulse>Live</Badge>
       </div>
     )},
   ],
@@ -158,7 +513,7 @@ export const previews: Record<string, Variant[]> = {
   ],
 
   card: [
-    { label: 'Example', node: (
+    { label: 'Default (no props)', node: (
       <Card style={{ maxWidth: 360 }}>
         <CardHeader>
           <CardTitle>Monthly Summary</CardTitle>
@@ -170,6 +525,99 @@ export const previews: Record<string, Variant[]> = {
           </p>
         </CardContent>
       </Card>
+    )},
+    { label: 'Header actions', node: (
+      <div style={{ display: 'grid', gap: 16, maxWidth: 460 }}>
+        <Card>
+          <CardHeader actions={<Button size="sm" variant="secondary">Export</Button>}>
+            <CardTitle>Spending by category</CardTitle>
+            <CardDescription>June 2025 · CAD</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p style={{ margin: 0, color: 'var(--muted-foreground)', fontSize: 'var(--text-body)' }}>
+              $3,240.00 across 8 categories
+            </p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader
+            actions={
+              <>
+                <Button size="sm" variant="ghost">Month</Button>
+                <Button size="sm" variant="secondary">Year</Button>
+              </>
+            }
+          >
+            <CardTitle>Cash flow</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p style={{ margin: 0, color: 'var(--muted-foreground)', fontSize: 'var(--text-body)' }}>
+              Title-only header, two actions.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    )},
+    { label: 'Variant × padding', node: (
+      <div style={{ display: 'grid', gap: 20 }}>
+        {(['default', 'nested', 'plain'] as const).map((variant) => (
+          <div key={variant}>
+            <p style={{ margin: '0 0 8px', fontSize: 'var(--text-label)', textTransform: 'uppercase', letterSpacing: '.06em', fontWeight: 600, color: 'var(--muted-foreground)' }}>
+              {variant}
+            </p>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, alignItems: 'stretch' }}>
+              {(['none', 'sm', 'default', 'lg'] as const).map((padding) => (
+                <Card key={padding} variant={variant} padding={padding} style={{ minWidth: 148 }}>
+                  <CardTitle style={{ fontSize: 'var(--text-body)' }}>{variant}</CardTitle>
+                  <CardDescription>padding={padding}</CardDescription>
+                </Card>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    )},
+    { label: 'Radius', node: (
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}>
+        {(['md', 'lg', 'xl'] as const).map((radius) => (
+          <Card key={radius} radius={radius} style={{ minWidth: 148 }}>
+            <CardTitle style={{ fontSize: 'var(--text-body)' }}>radius={radius}</CardTitle>
+          </Card>
+        ))}
+      </div>
+    )},
+    { label: 'Nested composition', node: (
+      <Card padding="lg" radius="xl" style={{ maxWidth: 460 }}>
+        <CardHeader actions={<Button size="sm" variant="ghost">Edit</Button>}>
+          <CardTitle>Accounts</CardTitle>
+          <CardDescription>Two connected, one needs attention.</CardDescription>
+        </CardHeader>
+        <CardContent style={{ display: 'grid', gap: 12 }}>
+          <Card variant="nested" padding="sm" radius="xl">
+            <CardTitle style={{ fontSize: 'var(--text-body)' }}>Chequing · 4021</CardTitle>
+            <CardDescription>Synced 6 minutes ago</CardDescription>
+          </Card>
+          <Card variant="nested" padding="sm" radius="xl">
+            <CardTitle style={{ fontSize: 'var(--text-body)' }}>Visa · 8842</CardTitle>
+            <CardDescription>Re-authentication required</CardDescription>
+          </Card>
+        </CardContent>
+      </Card>
+    )},
+    { label: 'Plain (consumer frame)', node: (
+      <div style={{ border: '1px dashed var(--input)', borderRadius: 'var(--radius-xl)', maxWidth: 400 }}>
+        <Card variant="plain">
+          <CardHeader actions={<Button size="sm" variant="ghost">Refresh</Button>}>
+            <CardTitle>Consumer-supplied frame</CardTitle>
+            <CardDescription>No border, no shadow, no fill.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p style={{ margin: 0, color: 'var(--muted-foreground)', fontSize: 'var(--text-body)' }}>
+              The dashed outline is the consumer&apos;s, not the card&apos;s.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
     )},
   ],
 
@@ -192,6 +640,43 @@ export const previews: Record<string, Variant[]> = {
         <Icon name="brand:paypal" size={34} brand />
         <Icon name="brand:cash-app" size={34} brand />
         <Icon name="brand:starbucks" size={34} brand />
+      </div>
+    )},
+    { label: 'Media & audio', node: (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 14, color: 'var(--foreground)' }}>
+        <div style={{ display: 'flex', gap: 16, alignItems: 'center', flexWrap: 'wrap' }}>
+          <Icon name="skip-back" size={24} />
+          <Icon name="rewind" size={24} />
+          <Icon name="play" size={24} />
+          <Icon name="pause" size={24} />
+          <Icon name="stop" size={24} />
+          <Icon name="fast-forward" size={24} />
+          <Icon name="skip-forward" size={24} />
+          <Icon name="play-circle" size={24} />
+          <Icon name="pause-circle" size={24} />
+          <Icon name="shuffle" size={24} />
+          <Icon name="repeat-1" size={24} />
+        </div>
+        <div style={{ display: 'flex', gap: 16, alignItems: 'center', flexWrap: 'wrap' }}>
+          <Icon name="volume-x" size={24} />
+          <Icon name="volume-1" size={24} />
+          <Icon name="volume" size={24} />
+          <Icon name="mic" size={24} />
+          <Icon name="mic-off" size={24} />
+          <Icon name="headphones" size={24} />
+          <Icon name="speaker" size={24} />
+          <Icon name="cast" size={24} />
+          <Icon name="airplay" size={24} />
+        </div>
+        <div style={{ display: 'flex', gap: 16, alignItems: 'center', flexWrap: 'wrap' }}>
+          <Icon name="music" size={24} />
+          <Icon name="disc" size={24} />
+          <Icon name="album" size={24} />
+          <Icon name="radio" size={24} />
+          <Icon name="podcast" size={24} />
+          <Icon name="list-music" size={24} />
+          <Icon name="audio-lines" size={24} />
+        </div>
       </div>
     )},
     { label: 'Registry', node: (
@@ -227,6 +712,34 @@ export const previews: Record<string, Variant[]> = {
         <Progress value={60} />
         <Progress value={74} tone="warning" label="Dining" showValue />
         <Progress value={100} tone="success" />
+      </div>
+    )},
+    { label: 'Readouts', node: (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 280 }}>
+        <Progress value={28} label="Now playing" valueText="1:23 / 4:56" />
+        <Progress value={43} tone="success" label="Statements imported" valueText="3 of 7" />
+        <Progress value={41} size="lg" label="Upload" valueText="820 MB / 2 GB" />
+      </div>
+    )},
+    { label: 'Segmented', node: (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 280 }}>
+        <Progress
+          label="Pauses & resumes"
+          valueText="12 paused / 9 resumed"
+          segments={[
+            { value: 57, tone: 'danger', label: 'Pauses' },
+            { value: 43, tone: 'primary', label: 'Resumes' },
+          ]}
+        />
+        <Progress
+          size="lg"
+          label="Disk by kind"
+          valueText="50% of 2 GB"
+          segments={[
+            { value: 30, tone: 'primary', label: 'Media' },
+            { value: 20, tone: 'warning', label: 'Statements' },
+          ]}
+        />
       </div>
     )},
   ],
@@ -276,6 +789,83 @@ export const previews: Record<string, Variant[]> = {
   ],
 
   // --- data -----------------------------------------------------------------
+  'data-table': [
+    { label: 'Sortable', node: <DataTablePreview /> },
+    { label: 'Loading', node: (
+      <DataTable columns={previewColumns} rows={[]} getRowKey={(t) => t.id} loading loadingRows={3} />
+    )},
+    { label: 'Empty', node: (
+      <DataTable
+        columns={previewColumns}
+        rows={[]}
+        getRowKey={(t) => t.id}
+        empty={<EmptyState title="No transactions" description="Import a statement to get started." />}
+      />
+    )},
+  ],
+
+  'chart-frame': [
+    { label: 'Default', node: (
+      <ChartFrame
+        title="Spend by month"
+        subtitle="Last 12 months, all accounts"
+        height={220}
+        style={{ width: '100%' }}
+      >
+        <FakeBars count={12} />
+      </ChartFrame>
+    )},
+    { label: 'Header actions + footer', node: (
+      <ChartFrame
+        title="Cash flow"
+        subtitle="Net of transfers"
+        height={200}
+        actions={<><Badge variant="secondary">Monthly</Badge><Button variant="ghost" size="sm">Export</Button></>}
+        footer="Source: imported ledger"
+        style={{ width: '100%' }}
+      >
+        <FakeBars count={10} />
+      </ChartFrame>
+    )},
+    { label: 'Auto height from rowCount', node: (
+      <ChartFrame
+        title="Spend by category"
+        subtitle="14 rows · height = rowCount × rowHeight, clamped"
+        height="auto"
+        rowCount={14}
+        rowHeight={24}
+        minHeight={180}
+        maxHeight={420}
+        style={{ width: '100%' }}
+      >
+        <FakeBars count={14} />
+      </ChartFrame>
+    )},
+    { label: 'Palette export', node: (
+      <ChartFrame
+        title="Chart palette"
+        subtitle="chartColors — every value is a var(--token) string"
+        height={180}
+        style={{ width: '100%' }}
+      >
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10, height: '100%' }}>
+          {([
+            ['categorical', chartColors.categorical],
+            ['line', chartColors.line],
+            ['domain', Object.values(chartColors.domain)],
+          ] as Array<[string, readonly string[]]>).map(([label, ramp]) => (
+            <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span style={{ width: 84, fontSize: 'var(--text-body-sm)', color: 'var(--muted-foreground)' }}>{label}</span>
+              {ramp.map((c) => (
+                <span key={c} title={c} style={{ width: 36, height: 28, borderRadius: 'var(--radius-md)', background: c, border: '1px solid var(--border)' }} />
+              ))}
+            </div>
+          ))}
+        </div>
+      </ChartFrame>
+    )},
+  ],
+
   'letter-avatar': [
     { label: 'Sizes', node: (
       <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
@@ -293,6 +883,32 @@ export const previews: Record<string, Variant[]> = {
         <StatCard label="Total Spending" value="$3,240.00" delta="+$340" metricKind="spend" />
         <StatCard label="Total Income" value="$8,500.00" delta="+$650" metricKind="gain" hint="vs. last month" />
       </div>
+    )},
+  ],
+
+  'stat-grid': [
+    { label: 'Auto-fit', node: (
+      <StatGrid>
+        <StatCard label="Net spend" value="$4,210" hint="This month" delta="-8%" metricKind="spend" />
+        <StatCard label="Income" value="$9,800" hint="vs last month" delta="+3%" metricKind="gain" />
+        <StatCard label="Net savings" value="$2,180" hint="After expenses" delta="+12%" metricKind="gain" />
+        <StatCard label="Transactions" value="312" hint="Current filters" delta="+24" metricKind="neutral" />
+      </StatGrid>
+    )},
+    { label: 'Fixed columns', node: (
+      <StatGrid columns={3} gap="lg">
+        <StatCard label="Net spend" value="$4,210" delta="-8%" metricKind="spend" />
+        <StatCard label="Income" value="$9,800" delta="+3%" metricKind="gain" />
+        <StatCard label="Transactions" value="312" delta="+24" metricKind="neutral" />
+      </StatGrid>
+    )},
+    { label: 'Divided', node: (
+      <StatGrid columns={4} divided>
+        <StatCard label="Net spend" value="$4,210" delta="-8%" metricKind="spend" />
+        <StatCard label="Income" value="$9,800" delta="+3%" metricKind="gain" />
+        <StatCard label="Net savings" value="$2,180" delta="+12%" metricKind="gain" />
+        <StatCard label="Transactions" value="312" delta="+24" metricKind="neutral" />
+      </StatGrid>
     )},
   ],
 
@@ -331,7 +947,12 @@ export const previews: Record<string, Variant[]> = {
     )},
   ],
 
-  tabs: [{ label: 'Interactive', node: <TabsPreview /> }],
+  tabs: [
+    { label: 'Interactive', node: <TabsPreview /> },
+    { label: 'Overflow — wrap (default)', node: <TabsWrapPreview /> },
+    { label: 'Overflow — scroll', node: <TabsScrollPreview /> },
+    { label: 'Wired to a panel', node: <TabsWithPanelPreview /> },
+  ],
 
   // --- feedback -------------------------------------------------------------
   alert: [
@@ -460,9 +1081,19 @@ export const previews: Record<string, Variant[]> = {
   ],
 
   'import-dropzone': [
-    { label: 'Example', node: (
-      <ImportDropzone accept=".csv,.ofx,.qfx" hint="CSV, OFX or QFX · up to 10MB" />
+    { label: 'Default', node: (
+      <ImportDropzone accept=".csv,.ofx,.qfx" maxSize={10 * 1e6} hint="CSV, OFX or QFX · up to 10MB" />
     )},
+    { label: 'Slotted copy', node: (
+      <ImportDropzone
+        multiple
+        accept="image/*,.pdf"
+        label="Drop receipts, or browse"
+        hint="PNG, JPG or PDF · any number"
+        replaceLabel="click to change"
+      />
+    )},
+    { label: 'Controlled', node: <ImportDropzonePreview /> },
   ],
 
   'money-input': [
@@ -512,12 +1143,52 @@ export const previews: Record<string, Variant[]> = {
     )},
   ],
 
+  field: [
+    { label: 'Label + hint', node: (
+      <div style={{ maxWidth: 300 }}>
+        <Field label="Merchant" hint="As it appears on the statement.">
+          <Input placeholder="Whole Foods Market" />
+        </Field>
+      </div>
+    )},
+    { label: 'Error (replaces the hint)', node: (
+      <div style={{ maxWidth: 300 }}>
+        <Field label="Merchant" hint="As it appears on the statement." error="Merchant is required.">
+          <Input defaultValue="" />
+        </Field>
+      </div>
+    )},
+    { label: 'Required + any control', node: (
+      <div style={{ display: 'grid', gap: 14, maxWidth: 300 }}>
+        <Field label="Account name" required hint="Shown throughout the app.">
+          <Input placeholder="Amex Cobalt" />
+        </Field>
+        <Field label="Currency" required>
+          <NativeSelect options={['CAD', 'USD', 'EUR', 'GBP']} />
+        </Field>
+        <Field label="Note" error="Note is too long.">
+          <Textarea placeholder="Add a note…" />
+        </Field>
+        <Field label="Auto-reconcile" hint="Match imported rows automatically.">
+          <Switch defaultChecked />
+        </Field>
+      </div>
+    )},
+  ],
+
   input: [
     { label: 'States', node: (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10, maxWidth: 280 }}>
         <Input placeholder="Enter a value…" />
         <Input defaultValue="Hello, world" />
         <Input invalid defaultValue="bad input" />
+      </div>
+    )},
+    { label: 'Adornments', node: (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 10, maxWidth: 280 }}>
+        <Input leadingIcon={SearchGlyph} placeholder="Search transactions…" />
+        <Input leadingIcon={SearchGlyph} clearable clearLabel="Clear search" defaultValue="whole foods" />
+        <Input trailingIcon={LockGlyph} defaultValue="••••••" />
       </div>
     )},
   ],
@@ -605,6 +1276,23 @@ export const previews: Record<string, Variant[]> = {
     )},
   ],
 
+  'upload-button': [
+    { label: 'Variants', node: (
+      <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
+        <UploadButton variant="primary">Import statement</UploadButton>
+        <UploadButton variant="secondary">Upload</UploadButton>
+        <UploadButton variant="outline" size="sm">Upload</UploadButton>
+      </div>
+    )},
+    { label: 'States', node: (
+      <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
+        <UploadButton loading loadingLabel="Uploading…">Upload</UploadButton>
+        <UploadButton disabled>Upload</UploadButton>
+      </div>
+    )},
+    { label: 'Interactive', node: <UploadButtonPreview /> },
+  ],
+
   // --- navigation -----------------------------------------------------------
   breadcrumb: [
     { label: 'Example', node: (
@@ -625,14 +1313,53 @@ export const previews: Record<string, Variant[]> = {
     { label: 'Example', node: (
       // `transform` establishes a containing block so the Dialog's position:fixed
       // scrim is contained to this preview cell instead of covering the whole page.
+      // `portal={false}` keeps it in the React tree so that containment applies,
+      // and `lockScroll={false}` stops an always-open preview from freezing the
+      // gallery page.
       <div style={{ position: 'relative', height: 280, overflow: 'hidden', borderRadius: 'var(--radius-md)', transform: 'translateZ(0)' }}>
         <Dialog
           open
+          portal={false}
+          lockScroll={false}
           title="Confirm action"
           description="This action cannot be undone. Are you sure you want to continue?"
         />
       </div>
     )},
+  ],
+
+  'confirm-dialog': [
+    { label: 'Default', node: (
+      <div style={{ position: 'relative', height: 200, overflow: 'hidden', borderRadius: 'var(--radius-md)', transform: 'translateZ(0)' }}>
+        <ConfirmDialog
+          open
+          portal={false}
+          lockScroll={false}
+          title="Save changes?"
+          description="Your edits apply to this account immediately."
+          confirmLabel="Save"
+          onClose={() => {}}
+        />
+      </div>
+    )},
+    { label: 'Destructive (Cancel focused, pending)', node: (
+      <div style={{ position: 'relative', height: 220, overflow: 'hidden', borderRadius: 'var(--radius-md)', transform: 'translateZ(0)' }}>
+        <ConfirmDialog
+          open
+          portal={false}
+          lockScroll={false}
+          tone="destructive"
+          title="Delete transaction?"
+          description="This removes it from all reports. You can't undo this."
+          confirmLabel="Delete"
+          pending
+          onClose={() => {}}
+        >
+          Whole Foods Market · −$84.20 · Groceries
+        </ConfirmDialog>
+      </div>
+    )},
+    { label: 'Imperative useConfirm()', node: <UseConfirmPreview /> },
   ],
 
   'dropdown-menu': [
@@ -671,6 +1398,8 @@ export const previews: Record<string, Variant[]> = {
       </div>
     )},
   ],
+
+  toaster: [{ label: 'Interactive', node: <ToasterPreview /> }],
 
   tooltip: [
     { label: 'Example', node: (

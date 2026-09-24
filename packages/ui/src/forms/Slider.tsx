@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { splitControlProps } from './fieldProps'
 import './Slider.css'
 
 /**
@@ -9,6 +10,11 @@ import './Slider.css'
  * Static visuals and the focus-visible ring live in `Slider.css`; only the
  * dynamic fill/thumb position is set inline via `--ca-slider-pct`. The ref
  * forwards to the underlying `input[type=range]`.
+ *
+ * `id`, `name` and the labelling/validation `aria-*` attributes are routed to
+ * that `input[type=range]` — the element that takes focus — so a `<label
+ * htmlFor>` (or a `Field` wrapper injecting them) actually associates. Layout
+ * props (`className`, `style`, `data-*`, handlers) stay on the wrapper.
  */
 export interface SliderProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'defaultValue' | 'onChange'> {
   min?: number
@@ -17,15 +23,18 @@ export interface SliderProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 
   value?: number
   defaultValue?: number
   onValueChange?: (value: number) => void
+  /** Form control name — forwarded to the inner `input[type=range]`. */
+  name?: string
   disabled?: boolean
   showValue?: boolean
   format?: (value: number) => React.ReactNode
 }
 
 export const Slider = React.forwardRef<HTMLInputElement, SliderProps>(function Slider(
-  { min = 0, max = 100, step = 1, value, defaultValue = 0, onValueChange, disabled, showValue = false, format, className, style, ...props },
+  { min = 0, max = 100, step = 1, value, defaultValue = 0, onValueChange, disabled, showValue = false, format, className, style, ...rest },
   ref,
 ): React.JSX.Element {
+  const { control, wrapper } = splitControlProps(rest)
   const [internal, setInternal] = React.useState(defaultValue)
   const isControlled = value !== undefined
   const v = isControlled ? value : internal
@@ -43,7 +52,7 @@ export const Slider = React.forwardRef<HTMLInputElement, SliderProps>(function S
       data-disabled={disabled || undefined}
       className={className ? `ca-slider ${className}` : 'ca-slider'}
       style={{ ['--ca-slider-pct' as string]: `${pct}%`, ...style }}
-      {...props}
+      {...wrapper}
     >
       {showValue && <div className="ca-slider-value">{format ? format(v) : v}</div>}
       <div className="ca-slider-track">
@@ -59,6 +68,7 @@ export const Slider = React.forwardRef<HTMLInputElement, SliderProps>(function S
           value={v}
           disabled={disabled}
           onChange={onInput}
+          {...control}
         />
         <div className="ca-slider-thumb" />
       </div>

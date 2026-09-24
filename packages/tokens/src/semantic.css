@@ -68,6 +68,16 @@
   --input: var(--zinc-300);
   --ring: var(--oxblood-500);
 
+  /* Scrollbars — derived, never a new raw colour. The track is the quiet
+   * surface the bar sits on; the thumb is the hairline nudged toward text so it
+   * is findable without becoming chrome you look at. --scrollbar-size is only
+   * honoured by the ::-webkit-scrollbar fallback (the standards-track
+   * `scrollbar-width` takes a keyword, not a length). */
+  --scrollbar-track: var(--muted);
+  --scrollbar-thumb: color-mix(in oklch, var(--muted-foreground) 35%, var(--border));
+  --scrollbar-thumb-hover: color-mix(in oklch, var(--muted-foreground) 70%, var(--border));
+  --scrollbar-size: 10px;
+
   /* Chart palette */
   --chart-1: var(--oxblood-500);
   --chart-2: var(--green-600);
@@ -146,6 +156,13 @@
   --border: #242427;
   --input: #3A3A3E;
   --ring: var(--oxblood-400);
+
+  /* Scrollbars — same derivation as light, which is the point: the browser's
+   * light-only scrollbar chrome was the last thing dark mode could not reach. */
+  --scrollbar-track: var(--muted);
+  --scrollbar-thumb: color-mix(in oklch, var(--muted-foreground) 35%, var(--border));
+  --scrollbar-thumb-hover: color-mix(in oklch, var(--muted-foreground) 70%, var(--border));
+  --scrollbar-size: 10px;
 
   /* Chart palette */
   --chart-1: var(--oxblood-300);

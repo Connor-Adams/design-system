@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { splitControlProps } from './fieldProps'
 import './Combobox.css'
 
 export type ComboboxOption = string | { value: string; label: string; hint?: string }
@@ -12,6 +13,11 @@ export type ComboboxOption = string | { value: string; label: string; hint?: str
  * Interactive states (focus ring, option hover/active highlight) live in
  * `Combobox.css`, keyed off `data-state` / `data-active` — no JS onMouseEnter.
  * The ref forwards to the search `<input>`.
+ *
+ * `id`, `name` and the labelling/validation `aria-*` attributes are routed to
+ * that search `<input>` — the element that takes focus — so a `<label htmlFor>`
+ * (or a `Field` wrapper injecting them) actually associates. Layout props
+ * (`className`, `style`, `data-*`, handlers) stay on the wrapper.
  */
 export interface ComboboxProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'defaultValue' | 'onChange'> {
   options: ComboboxOption[]
@@ -20,13 +26,16 @@ export interface ComboboxProps extends Omit<React.HTMLAttributes<HTMLDivElement>
   onValueChange?: (value: string) => void
   placeholder?: string
   emptyText?: string
+  /** Form control name — forwarded to the inner search `<input>`. */
+  name?: string
   size?: 'sm' | 'default'
 }
 
 export const Combobox = React.forwardRef<HTMLInputElement, ComboboxProps>(function Combobox(
-  { options = [], value, defaultValue = null, onValueChange, placeholder = 'Search…', emptyText = 'No matches', size = 'default', className, ...props },
+  { options = [], value, defaultValue = null, onValueChange, placeholder = 'Search…', emptyText = 'No matches', size = 'default', className, ...rest },
   ref,
 ): React.JSX.Element {
+  const { control, wrapper } = splitControlProps(rest)
   const norm = options.map((o) => (typeof o === 'string' ? { value: o, label: o } : o))
   const [internal, setInternal] = React.useState<string | null>(defaultValue)
   const isControlled = value !== undefined
@@ -74,7 +83,7 @@ export const Combobox = React.forwardRef<HTMLInputElement, ComboboxProps>(functi
       data-slot="combobox"
       data-size={size}
       className={className ? `ca-combobox ${className}` : 'ca-combobox'}
-      {...props}
+      {...wrapper}
     >
       <div className="ca-combobox-control" data-state={open ? 'open' : 'closed'} onClick={() => setOpen(true)}>
         <svg className="ca-combobox-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--muted-foreground)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="7" /><path d="m21 21-4.3-4.3" /></svg>
@@ -88,6 +97,7 @@ export const Combobox = React.forwardRef<HTMLInputElement, ComboboxProps>(functi
             if (!open) setOpen(true)
           }}
           onFocus={() => setOpen(true)}
+          {...control}
         />
       </div>
       {open && (

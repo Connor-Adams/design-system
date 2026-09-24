@@ -1,0 +1,89 @@
+<!-- @dsCard group="Components" viewport="700x520" name="ConfirmDialog" subtitle="The window.confirm replacement — two tones, async pending" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="../../styles.css" />
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script>
+<style>
+  body { margin: 0; padding: 20px; background: var(--card); font-family: var(--font-sans); }
+  .wrap { display: flex; flex-direction: column; gap: 14px; max-width: 640px; }
+  .label { font-size: var(--text-body-sm); color: var(--muted-foreground); }
+  /* `transform` establishes a containing block, so a ConfirmDialog rendered with
+     portal={false} keeps its fixed scrim inside the cell instead of covering the
+     whole card. */
+  .cell {
+    position: relative;
+    height: 190px;
+    overflow: hidden;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    transform: translateZ(0);
+  }
+  .row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+  const { ConfirmDialog, useConfirm, Button } = window.CashflowDesignSystem_2cf89d;
+
+  // Contained (portal={false}) so both tones are visible at once in the card.
+  const contained = { portal: false, lockScroll: false, onClose: () => {} };
+
+  function Demo() {
+    const { confirm, dialog } = useConfirm({ tone: 'destructive', confirmLabel: 'Delete' });
+    const [answer, setAnswer] = React.useState('—');
+    return (
+      <div className="wrap">
+        <div>
+          <div className="label">default tone — Confirm is focused</div>
+          <div className="cell">
+            <ConfirmDialog
+              {...contained}
+              open
+              title="Save changes?"
+              description="Your edits apply to this account immediately."
+              confirmLabel="Save"
+            />
+          </div>
+        </div>
+
+        <div>
+          <div className="label">destructive tone — Cancel is focused, and a promise holds it pending</div>
+          <div className="cell">
+            <ConfirmDialog
+              {...contained}
+              open
+              tone="destructive"
+              title="Delete transaction?"
+              description="This removes it from all reports. You can’t undo this."
+              confirmLabel="Delete"
+              pending
+            >
+              Whole Foods Market · −$84.20 · Groceries
+            </ConfirmDialog>
+          </div>
+        </div>
+
+        <div className="row">
+          <Button
+            variant="destructive"
+            onClick={async () => setAnswer((await confirm({ title: 'Delete sound?', description: 'The clip and its soundboard button are removed.' })) ? 'confirmed' : 'cancelled')}
+          >
+            useConfirm() — if (await confirm(…))
+          </Button>
+          <span className="label">Last answer: {answer}</span>
+        </div>
+        {dialog}
+      </div>
+    );
+  }
+  ReactDOM.createRoot(document.getElementById('root')).render(<Demo />);
+</script>
+</body>
+</html>

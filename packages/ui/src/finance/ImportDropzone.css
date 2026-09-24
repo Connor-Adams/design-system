@@ -1,17 +1,17 @@
-/* ImportDropzone — dashed statement drop target. The drag-highlight is genuine
-   drag-drop state (not hover), reflected via data-drag and styled here. Static,
-   drag, and the required focus-visible ring all live in CSS. */
+/* ImportDropzone — dashed drop surface wrapped around a real UploadButton.
+   The drag-highlight is genuine drag-drop state (not hover), reflected via
+   data-drag and styled here. The trigger inherits its interactive states and its
+   focus-visible ring from Button.css; the overrides below flatten the Button
+   into the stacked full-bleed target and are attribute-qualified so they win over
+   Button.css regardless of bundle order. No hard-coded colors. */
 
 .ca-import-dropzone {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  text-align: center;
-  padding: 28px 24px;
+  /* 2px so the trigger's focus ring (outline-offset: 2px, from Button.css)
+     lands on the dashed border instead of being drawn outside it. */
+  padding: 2px;
   border-radius: var(--radius-xl);
-  cursor: pointer;
   font-family: var(--font-sans);
   border: 1.5px dashed var(--input);
   background: var(--card);
@@ -24,7 +24,36 @@
   background: color-mix(in oklch, var(--ring) 8%, var(--card));
 }
 
+.ca-import-dropzone[data-disabled='true'] {
+  opacity: 0.6;
+}
+
+/* The click/keyboard target: a Button flattened to fill the surface. */
+.ca-import-dropzone .ca-import-dropzone-trigger[data-variant][data-size] {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  height: auto;
+  padding: 26px 22px;
+  border: 0;
+  border-radius: calc(var(--radius-xl) - 2px);
+  background: transparent;
+  color: inherit;
+  font-weight: var(--weight-regular);
+  font-size: var(--text-body);
+  text-align: center;
+  white-space: normal;
+}
+
+.ca-import-dropzone .ca-import-dropzone-trigger[data-variant][data-size]:hover:not(:disabled) {
+  background: color-mix(in oklch, var(--accent) 60%, transparent);
+}
+
 .ca-import-dropzone-icon {
+  flex: none;
   width: 44px;
   height: 44px;
   border-radius: 50%;
@@ -54,6 +83,7 @@
 
 .ca-import-dropzone-sub {
   font-size: var(--text-body-sm);
+  font-weight: var(--weight-regular);
   color: var(--muted-foreground);
 }
 
@@ -65,7 +95,22 @@
   color: var(--text-link);
 }
 
-.ca-import-dropzone:focus-visible {
+/* Rejection announcements. Always in the DOM (and so in the a11y tree) so the
+   polite live region is there before the text arrives; collapses to zero height
+   while empty rather than being display:none. */
+.ca-import-dropzone-error {
+  display: block;
+  text-align: center;
+  font-size: var(--text-body-sm);
+  color: var(--destructive);
+}
+
+.ca-import-dropzone-error:not(:empty) {
+  padding: 0 22px 14px;
+}
+
+.ca-import-dropzone:focus-visible,
+.ca-import-dropzone .ca-import-dropzone-trigger:focus-visible {
   outline: 2px solid var(--ring);
   outline-offset: 2px;
 }

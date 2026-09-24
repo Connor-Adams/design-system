@@ -1,5 +1,6 @@
 /* Dialog — a centered popover card over a dimmed, blurred scrim. Layout and
-   visuals live in CSS; open/close behavior (Escape, scrim click) stays in JS.
+   visuals live in CSS; behavior (Escape via the dismiss stack, scrim click,
+   focus trap, scroll lock, portal) stays in JS.
    All colors reach through the semantic token layer; no raw hex. */
 
 .ca-dialog-scrim {
@@ -13,6 +14,7 @@
   background: color-mix(in srgb, var(--foreground) 45%, transparent);
   backdrop-filter: blur(2px);
   font-family: var(--font-sans);
+  animation: ca-dialog-scrim-in 140ms ease-out;
 }
 
 .ca-dialog {
@@ -26,6 +28,19 @@
   display: flex;
   flex-direction: column;
   gap: 14px;
+  animation: ca-dialog-in 160ms ease-out;
+}
+
+/* The card is programmatically focusable (tabindex="-1") so focus can land
+   somewhere sane when the dialog holds nothing focusable. Programmatic focus
+   does not trigger :focus-visible, so the ring only shows for keyboard users
+   who actually tab to it. */
+.ca-dialog:focus {
+  outline: none;
+}
+.ca-dialog:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
 }
 
 /* ---- Sizes ---- */
@@ -67,4 +82,31 @@
   justify-content: flex-end;
   gap: 8px;
   margin-top: 2px;
+}
+
+@keyframes ca-dialog-scrim-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes ca-dialog-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ca-dialog-scrim,
+  .ca-dialog {
+    animation: none;
+  }
 }

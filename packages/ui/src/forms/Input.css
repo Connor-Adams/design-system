@@ -38,8 +38,104 @@
   cursor: not-allowed;
 }
 
+/* --- Adornments ----------------------------------------------------------
+   The wrapper only exists when a leading/trailing icon or the clear button is
+   passed, so a plain field keeps its original single-element DOM. The space an
+   adornment occupies is reserved HERE, off data-leading / data-trailing — the
+   component never measures an icon in JS. */
+
+.ca-input-wrap {
+  position: relative;
+  display: block;
+  width: 100%;
+}
+
+.ca-input[data-leading='true'] {
+  padding-left: 34px;
+}
+.ca-input[data-trailing='1'] {
+  padding-right: 34px;
+}
+.ca-input[data-trailing='2'] {
+  padding-right: 58px;
+}
+
+.ca-input-adornment {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  color: var(--muted-foreground);
+  /* Decorative — clicks belong to the field underneath. */
+  pointer-events: none;
+}
+
+.ca-input-adornment--leading {
+  left: 10px;
+}
+
+.ca-input-trailing {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  /* Only the clear button is clickable; the gaps let clicks reach the field. */
+  pointer-events: none;
+}
+
+/* Inside the trailing cluster the icons are laid out by flex, not absolutely. */
+.ca-input-trailing .ca-input-adornment {
+  position: static;
+}
+
+.ca-input-clear {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--muted-foreground);
+  cursor: pointer;
+  pointer-events: auto;
+  transition: background-color 150ms, color 150ms, opacity 150ms;
+}
+
+.ca-input-clear:hover {
+  background: var(--muted);
+  color: var(--foreground);
+}
+
+.ca-input-clear:active {
+  background: var(--secondary-hover);
+}
+
+.ca-input-clear:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+/* Nothing to clear: kept in the layout so the text does not shift, but hidden
+   and (via [disabled] on the button itself) out of the tab order. */
+.ca-input-clear[data-visible='false'] {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .ca-input {
+  .ca-input,
+  .ca-input-clear {
     transition: none;
   }
 }

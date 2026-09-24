@@ -1,4 +1,4 @@
-<!-- @dsCard group="Components" viewport="700x200" name="Slider" subtitle="Single-value range — oxblood fill, card thumb" -->
+<!-- @dsCard group="Components" viewport="700x250" name="Slider" subtitle="Single-value range — oxblood fill, card thumb" -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -21,17 +21,20 @@
 <body>
 <div id="root"></div>
 <script type="text/babel">
-  const { Slider, Text } = window.CashflowDesignSystem_2cf89d;
+  const { Label, Slider, Text } = window.CashflowDesignSystem_2cf89d;
   function Demo() {
     return (
       <div className="wrap box">
         <div className="stack">
-          <Text variant="label" tone="muted">Large-transaction alert</Text>
-          <Slider min={0} max={500} step={10} defaultValue={120} showValue format={(v) => '$' + v} />
+          <Label htmlFor="threshold">Large-transaction alert</Label>
+          <Slider id="threshold" name="threshold" aria-describedby="threshold-hint" min={0} max={500} step={10} defaultValue={120} showValue format={(v) => '$' + v} />
+          <Text id="threshold-hint" variant="body-sm" tone="muted">
+            id / name / aria-* are routed to the inner range input, so clicking the label focuses the control.
+          </Text>
         </div>
         <div className="stack">
           <Text variant="label" tone="muted">Disabled</Text>
-          <Slider defaultValue={40} disabled />
+          <Slider aria-label="Disabled example" defaultValue={40} disabled />
         </div>
       </div>
     );

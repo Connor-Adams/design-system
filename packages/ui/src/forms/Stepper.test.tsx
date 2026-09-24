@@ -46,4 +46,26 @@ describe('Stepper', () => {
     expect(ref.current).toBeInstanceOf(HTMLDivElement)
     expect(ref.current).toHaveAttribute('data-slot', 'stepper')
   })
+
+  // --- labelled group ----------------------------------------------------------
+  // Stepper is inherently multi-element: the two buttons take focus, the readout
+  // does not, and no single child is "the" control — so a bare `id` cannot be
+  // made labelable. The honest answer is a labelled group: the root carries
+  // role="group", which is what makes an injected aria-labelledby /
+  // aria-describedby announce.
+
+  it('exposes the root as a group so aria-labelledby names the whole control', () => {
+    render(
+      <>
+        <span id="split-label">Split count</span>
+        <Stepper aria-labelledby="split-label" defaultValue={2} />
+      </>,
+    )
+    expect(screen.getByRole('group', { name: 'Split count' })).toHaveAttribute('data-slot', 'stepper')
+  })
+
+  it('accepts aria-label on the group', () => {
+    render(<Stepper aria-label="Months back" defaultValue={3} />)
+    expect(screen.getByRole('group', { name: 'Months back' })).toBeInTheDocument()
+  })
 })

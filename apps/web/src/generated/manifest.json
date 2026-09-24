@@ -60,6 +60,16 @@
     "category": "core"
   },
   {
+    "slug": "chart-frame",
+    "name": "ChartFrame",
+    "category": "data"
+  },
+  {
+    "slug": "data-table",
+    "name": "DataTable",
+    "category": "data"
+  },
+  {
     "slug": "letter-avatar",
     "name": "LetterAvatar",
     "category": "data"
@@ -67,6 +77,11 @@
   {
     "slug": "stat-card",
     "name": "StatCard",
+    "category": "data"
+  },
+  {
+    "slug": "stat-grid",
+    "name": "StatGrid",
     "category": "data"
   },
   {
@@ -150,6 +165,11 @@
     "category": "forms"
   },
   {
+    "slug": "field",
+    "name": "Field",
+    "category": "forms"
+  },
+  {
     "slug": "input",
     "name": "Input",
     "category": "forms"
@@ -195,6 +215,11 @@
     "category": "forms"
   },
   {
+    "slug": "upload-button",
+    "name": "UploadButton",
+    "category": "forms"
+  },
+  {
     "slug": "breadcrumb",
     "name": "Breadcrumb",
     "category": "navigation"
@@ -203,6 +228,11 @@
     "slug": "pagination",
     "name": "Pagination",
     "category": "navigation"
+  },
+  {
+    "slug": "confirm-dialog",
+    "name": "ConfirmDialog",
+    "category": "overlays"
   },
   {
     "slug": "dialog",
@@ -217,6 +247,11 @@
   {
     "slug": "toast",
     "name": "Toast",
+    "category": "overlays"
+  },
+  {
+    "slug": "toaster",
+    "name": "Toaster",
     "category": "overlays"
   },
   {

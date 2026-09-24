@@ -1,0 +1,110 @@
+/* ChartFrame — the card shell + header + sizing box a chart lives in.
+   Everything presentational lives here so a consumer className can override
+   it; the .tsx passes only the resolved plot height, as the
+   --ca-chart-frame-height custom property. Padding scale is keyed off
+   data-padding on the root. The shell duplicates .ca-card off the same tokens
+   rather than composing it, because Card on this branch has a fixed 20px
+   padding and no header actions slot; a configurable Card is landing in
+   parallel, and this block is the piece to delete when it does. */
+
+.ca-chart-frame {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--card-foreground);
+  box-shadow: var(--shadow);
+  font-family: var(--font-sans);
+}
+
+.ca-chart-frame[data-padding='default'] {
+  padding: 24px;
+  gap: 16px;
+}
+.ca-chart-frame[data-padding='compact'] {
+  padding: 16px;
+  gap: 12px;
+}
+.ca-chart-frame[data-padding='none'] {
+  padding: 0;
+  gap: 0;
+  overflow: hidden;
+}
+
+/* Header: heading stack on the left, actions pinned right. Wraps before the
+   actions get crushed. */
+.ca-chart-frame__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  min-width: 0;
+}
+
+.ca-chart-frame[data-padding='none'] .ca-chart-frame__header,
+.ca-chart-frame[data-padding='none'] .ca-chart-frame__footer {
+  padding: 16px 20px;
+}
+
+.ca-chart-frame__heading {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.ca-chart-frame__title {
+  font-size: var(--text-headline-sm);
+  font-weight: var(--weight-semibold);
+  letter-spacing: -0.01em;
+  color: var(--foreground);
+}
+
+.ca-chart-frame__subtitle {
+  font-size: var(--text-body-sm);
+  line-height: 1.4;
+  color: var(--muted-foreground);
+}
+
+.ca-chart-frame__actions {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 8px;
+}
+
+/* The sizing box. width:100% + a known height is what every charting library's
+   responsive container needs to measure against. min-width:0 keeps it from
+   blowing out a CSS grid column. */
+.ca-chart-frame__plot {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  height: var(--ca-chart-frame-height, 280px);
+  /* In 'auto' mode the height tracks the row count, so it changes when the
+     data changes — ease that rather than snapping. */
+  transition: height 160ms ease;
+}
+
+.ca-chart-frame__footer {
+  font-size: var(--text-body-sm);
+  line-height: 1.4;
+  color: var(--muted-foreground);
+}
+
+/* Nothing here is focusable by default, but a consumer can make the frame or
+   the plot box keyboard-reachable (tabIndex, a scrollable plot). Give both a
+   ring so that never lands without one. */
+.ca-chart-frame:focus-visible,
+.ca-chart-frame__plot:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ca-chart-frame__plot {
+    transition: none;
+  }
+}

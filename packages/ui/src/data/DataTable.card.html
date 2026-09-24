@@ -1,0 +1,90 @@
+<!-- @dsCard group="Components" viewport="700x560" name="DataTable" subtitle="Column-config table: sorting, loading and empty states" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="../../styles.css" />
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script>
+<style>
+  body { margin: 0; padding: 20px; background: var(--card); font-family: var(--font-sans); }
+  .grid { display: flex; flex-direction: column; gap: 14px; }
+  .bar { display: flex; align-items: center; gap: 8px; }
+  .label { font-size: var(--text-body-sm); color: var(--muted-foreground); text-transform: uppercase; letter-spacing: 0.02em; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+  const { DataTable, Badge, LetterAvatar, EmptyState, Button } = window.CashflowDesignSystem_2cf89d;
+
+  const txns = [
+    { id: 't1', date: 'Jun 15', merchant: 'Whole Foods Market', category: 'Groceries', amount: -94.32 },
+    { id: 't2', date: 'Jun 14', merchant: 'Acme Corp Payroll', category: 'Income', amount: 4250 },
+    { id: 't3', date: 'Jun 13', merchant: 'Netflix Subscription', category: 'Subscriptions', amount: -18.99 },
+    { id: 't4', date: 'Jun 12', merchant: 'Shell', category: 'Transport', amount: -62.40 },
+  ];
+
+  const money = (n) => (n < 0 ? '\u2212' : '+') + '$' + Math.abs(n).toFixed(2);
+
+  const columns = [
+    { key: 'date', header: 'Date', width: 88, sortable: true },
+    { key: 'merchant', header: 'Merchant', sortable: true, render: (t) => (
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+          <LetterAvatar text={t.merchant} size="sm" />{t.merchant}
+        </span>
+      ) },
+    { key: 'category', header: 'Category', render: (t) => <Badge variant="secondary">{t.category}</Badge> },
+    { key: 'amount', header: 'Amount', align: 'right', width: 128, sortable: true, render: (t) => (
+        <span style={{ fontWeight: 600, color: t.amount < 0 ? 'var(--negative)' : 'var(--positive)' }}>{money(t.amount)}</span>
+      ) },
+  ];
+
+  function Demo() {
+    // Sorting is controlled — DataTable reports the next state, we order the data.
+    const [sort, setSort] = React.useState({ key: 'amount', direction: 'desc' });
+    const [mode, setMode] = React.useState('data');
+    const rows = React.useMemo(() => {
+      if (!sort) return txns;
+      const dir = sort.direction === 'asc' ? 1 : -1;
+      return [...txns].sort((a, b) => {
+        const x = a[sort.key], y = b[sort.key];
+        return (typeof x === 'number' ? x - y : String(x).localeCompare(String(y))) * dir;
+      });
+    }, [sort]);
+    return (
+      <div className="grid">
+        <div className="bar">
+          <span className="label">State</span>
+          <Button size="sm" variant={mode === 'data' ? 'default' : 'outline'} onClick={() => setMode('data')}>Rows</Button>
+          <Button size="sm" variant={mode === 'loading' ? 'default' : 'outline'} onClick={() => setMode('loading')}>Loading</Button>
+          <Button size="sm" variant={mode === 'empty' ? 'default' : 'outline'} onClick={() => setMode('empty')}>Empty</Button>
+        </div>
+        <DataTable
+          columns={columns}
+          rows={mode === 'data' ? rows : []}
+          getRowKey={(t) => t.id}
+          sort={sort}
+          onSortChange={setSort}
+          loading={mode === 'loading'}
+          loadingRows={4}
+          empty={<EmptyState title="No transactions" description="Import a statement to get started." />}
+          aria-label="Recent transactions"
+        />
+        <span className="label">maxHeight — sticky head over a scroll region</span>
+        <DataTable
+          columns={columns}
+          rows={[...rows, ...rows.map((t) => ({ ...t, id: t.id + '-b' }))]}
+          getRowKey={(t) => t.id}
+          maxHeight="150px"
+        />
+      </div>
+    );
+  }
+  ReactDOM.createRoot(document.getElementById('root')).render(<Demo />);
+</script>
+</body>
+</html>

@@ -1,7 +1,7 @@
 {
   "name": "@connor-adams/designsystem",
   "version": "1.0.0",
-  "description": "Connor Adams design system — React components built on @connor-adams/tokens.",
+  "description": "Connor Adams design system \u2014 React components built on @connor-adams/tokens.",
   "license": "SEE LICENSE FILE",
   "type": "module",
   "repository": {
@@ -20,6 +20,10 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
+    },
+    "./chart": {
+      "types": "./dist/chart.d.ts",
+      "import": "./dist/chart.js"
     },
     "./styles.css": "./styles.css"
   },

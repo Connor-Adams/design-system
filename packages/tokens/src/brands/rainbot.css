@@ -1,0 +1,97 @@
+/* ─────────────────────────────────────────────────────────────────────────
+ * Rainbot — brand scope
+ *
+ * A worked example of the brand axis. See the Customization section of the
+ * README for the full set of tokens a brand may override.
+ *
+ * SCOPE: `:root[data-brand="rainbot"][data-theme="dark"]`. Both attributes:
+ *   <html data-brand="rainbot" data-theme="dark">
+ *
+ * The theme is part of the selector ON PURPOSE, not a convention. Scoped to
+ * `[data-brand]` alone, forgetting `data-theme="dark"` left the brand's dark
+ * values sitting on Cashflow's LIGHT surfaces, and the result was not merely
+ * ugly -- it was two hard a11y failures: --foreground #18181B on --accent
+ * #3a1024 is 1.08:1, so outline/ghost Button labels (and TrackInfo, QueueList
+ * and PlaybackControls hovers, which share that fill) were invisible; and
+ * --text-link #60a5fa on white is 2.54:1, failing AA and even large-text.
+ * Requiring both attributes makes the failure mode "brand does not apply,
+ * clean Cashflow light" instead of "silently unreadable".
+ *
+ * A brand is a DELTA, not a fork. Everything not named here falls through to
+ * the active theme block in semantic.css, which is the point — this file is
+ * ~20 declarations, not a restatement of the token layer. Rainbot is a Discord
+ * dashboard and therefore dark-only, so it is written against the dark theme
+ * and expects `data-theme="dark"` to be set; pairing it with the light theme
+ * will give light surfaces under a blue brand, which is nobody's intent.
+ *
+ * Because the selector carries two attributes it is specificity 0,3,0 and beats
+ * `:root[data-theme="dark"]` (0,2,0) outright, so it no longer depends on source
+ * order. Import it after the base stylesheet anyway -- a brand that later drops
+ * to a single attribute would silently need the ordering back:
+ *   @import "@connor-adams/tokens/styles.css";
+ *   @import "@connor-adams/tokens/brands/rainbot.css";
+ * ──────────────────────────────────────────────────────────────────────── */
+
+:root[data-brand="rainbot"][data-theme="dark"] {
+  /* Primitives. Prefixed `--rb-` so they cannot collide with the shared ramps
+   * in colors.css. Only the triad is needed — Rainbot's greys are close enough
+   * to the Cashflow dark surfaces that overriding them would be noise. */
+  --rb-blue-300: #93c5fd;
+  --rb-blue-400: #60a5fa;
+  --rb-blue-500: #3b82f6;
+  --rb-violet-400: #a78bfa;
+  --rb-violet-500: #8b5cf6;
+  --rb-pink-300: #f9a8d4;
+  --rb-pink-400: #f472b6;
+  --rb-pink-500: #ec4899;
+
+  /* Brand hue: blue where Cashflow is oxblood. */
+  --primary: var(--rb-blue-500);
+  --primary-hover: var(--rb-blue-400);
+  --primary-foreground: #ffffff;
+  --ring: var(--rb-blue-500);
+
+  /* --accent is NOT "the third brand hue" -- it is the subtle hover FILL for
+   * outline and ghost buttons (Button.css uses `background: var(--accent)` on
+   * both). Cashflow points it at --oxblood-900 in dark for exactly that reason.
+   * Setting it to full-saturation pink makes every outline/ghost button hover
+   * to a solid hot-pink block, which is why this is a dark pink tint and not
+   * --rb-pink-500. Rainbot's vivid pink lives in --gradient-hero-to and
+   * --chart-3, where a saturated hue is actually wanted. */
+  --accent: #3a1024;
+  --accent-foreground: var(--rb-pink-300);
+
+  /* Links are a visible blue here. Cashflow deliberately keeps them neutral
+   * (foreground + underline on hover); Rainbot is a dashboard, not prose. */
+  --text-link: var(--rb-blue-400);
+  --text-link-hover: var(--rb-blue-300);
+
+  /* --info must move off the brand hue. Cashflow points it at --chart-steel
+   * (#5EA8E0), which read as "steel blue, not oxblood" there but reads as "the
+   * brand colour" here -- an info Toast (Toast.css border-left-color) would be
+   * chromatically indistinguishable from a primary element. Violet keeps it
+   * inside the brand family while staying clearly not --primary. */
+  --info: var(--rb-violet-400);
+
+  /* Brand moment: the blue → violet → pink sweep, replacing Cashflow's
+   * orange → magenta. Both stops move with the gradient because chart and bar
+   * fills read --gradient-hero-from/to directly. */
+  --gradient-hero: linear-gradient(135deg, var(--rb-blue-500), var(--rb-violet-500), var(--rb-pink-500));
+  --gradient-hero-from: var(--rb-blue-500);
+  --gradient-hero-to: var(--rb-pink-500);
+
+  /* Categorical chart ramp walks the triad first, then a status hue, so a
+   * 5-series chart never repeats and never reads as a signal where none is
+   * meant. The domain-named aliases (--chart-spend, --chart-credit, …) are
+   * left alone: Rainbot has no money, so nothing should be reaching for them. */
+  --chart-1: var(--rb-blue-500);
+  --chart-2: var(--rb-violet-500);
+  --chart-3: var(--rb-pink-500);
+  --chart-4: #34d399;
+  --chart-5: #6b6b7a;
+  --chart-line-1: var(--rb-blue-400);
+  --chart-line-2: var(--rb-violet-400);
+  --chart-line-3: var(--rb-pink-400);
+
+  color-scheme: dark;
+}

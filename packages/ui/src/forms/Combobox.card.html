@@ -1,4 +1,4 @@
-<!-- @dsCard group="Components" viewport="700x300" name="Combobox" subtitle="Searchable single-select with filtering" -->
+<!-- @dsCard group="Components" viewport="700x340" name="Combobox" subtitle="Searchable single-select with filtering" -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -20,14 +20,14 @@
 <body>
 <div id="root"></div>
 <script type="text/babel">
-  const { Combobox, Text } = window.CashflowDesignSystem_2cf89d;
+  const { Combobox, Label, Text } = window.CashflowDesignSystem_2cf89d;
   function Demo() {
     
     return (
       <div className="wrap">
         <div className="stack">
-          <Text variant="label" tone="muted">Assign category</Text>
-          <Combobox defaultValue="groceries" placeholder="Search categories…" options={[
+          <Label htmlFor="category">Assign category</Label>
+          <Combobox id="category" name="category" aria-describedby="category-hint" defaultValue="groceries" placeholder="Search categories…" options={[
             { value: 'groceries', label: 'Groceries' },
             { value: 'dining', label: 'Dining' },
             { value: 'transport', label: 'Transport' },
@@ -35,8 +35,11 @@
             { value: 'income', label: 'Income' },
             { value: 'fees', label: 'Fees' },
           ]} />
+          <Text id="category-hint" variant="body-sm" tone="muted">Type to filter; click to select.</Text>
         </div>
-        <Text variant="body-sm" tone="muted">Type to filter; click to select.</Text>
+        <Text variant="body-sm" tone="muted">
+          id / name / aria-* are routed to the inner search input, so clicking the label focuses the field.
+        </Text>
       </div>
     );
   }

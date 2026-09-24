@@ -1,18 +1,33 @@
-/* Progress — a determinate/indeterminate bar over a muted track. The fill tone
-   and width are dynamic so they stay inline in the .tsx; the static layout and
-   the indeterminate sweep animation live here so the sweep can respect
-   prefers-reduced-motion. */
+/* Progress — a determinate/indeterminate/segmented bar over a muted track. The
+   tone and the width are per-instance data so they stay inline in the .tsx; the
+   static layout, the size ladder, and the motion live here so heights come from
+   the spacing tokens and every animation can respect prefers-reduced-motion. */
 
 .ca-progress {
+  --ca-progress-height: var(--space-2); /* 8px — default */
   display: flex;
   flex-direction: column;
   gap: 6px;
   width: 100%;
 }
 
+.ca-progress[data-size='sm'] {
+  --ca-progress-height: var(--space-1); /* 4px */
+}
+
+.ca-progress[data-size='lg'] {
+  --ca-progress-height: var(--space-3); /* 12px */
+}
+
+.ca-progress:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
 .ca-progress__head {
   display: flex;
   justify-content: space-between;
+  gap: 8px;
   font-size: var(--text-body-sm);
   font-family: var(--font-sans);
 }
@@ -25,6 +40,7 @@
   color: var(--foreground);
   font-family: var(--font-mono);
   font-weight: var(--weight-semibold);
+  white-space: nowrap;
 }
 
 .ca-progress__fill {
@@ -38,8 +54,24 @@
   position: relative;
   overflow: hidden;
   width: 100%;
+  height: var(--ca-progress-height);
   border-radius: 99px;
   background: var(--muted);
+}
+
+/* Stacked segments. The track clips the ends, so the bands themselves stay
+   square — per-band radii would gouge notches between neighbours. */
+.ca-progress__segments {
+  display: flex;
+  height: 100%;
+  width: 100%;
+}
+
+.ca-progress__segment {
+  display: block;
+  height: 100%;
+  min-width: 0;
+  transition: width 300ms ease;
 }
 
 .ca-progress__sweep {
@@ -65,5 +97,10 @@
   .ca-progress__sweep {
     animation: none;
     left: 30%;
+  }
+
+  .ca-progress__fill,
+  .ca-progress__segment {
+    transition: none;
   }
 }

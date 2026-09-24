@@ -1,0 +1,37 @@
+/* UploadButton — the visible root IS a `core/Button`, so every interactive state
+   (hover, the focus-visible ring, active, disabled) already lives in Button.css.
+   This file only hides the input and keeps the label from wrapping mid-upload.
+   No hard-coded colors: everything reaches through the token layer. */
+
+/* The input is a click proxy, not a control the user sees or tabs to. */
+.ca-upload-button-input {
+  display: none;
+}
+
+.ca-upload-button {
+  position: relative;
+}
+
+.ca-upload-button-label {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+/* Swapping the icon for a Spinner must not make the button jump width, so the
+   busy label keeps the same box. */
+.ca-upload-button[data-loading='true'] {
+  cursor: progress;
+}
+
+/* Button.css owns the focus ring, but state it here too so this component is
+   self-sufficient if it is ever used without the Button base class. */
+.ca-upload-button:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ca-upload-button {
+    transition: none;
+  }
+}

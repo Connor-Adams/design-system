@@ -1,4 +1,4 @@
-<!-- @dsCard group="Components" viewport="700x340" name="Overlays — Dialog, Tooltip, Toast" subtitle="Modal scrim, hover hints, transient toasts" -->
+<!-- @dsCard group="Components" viewport="700x360" name="Overlays — Dialog, Tooltip, Toast" subtitle="Modal scrim with focus trap, hover hints, transient toasts" -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -18,7 +18,7 @@
 <body>
 <div id="root"></div>
 <script type="text/babel">
-  const { Dialog, Tooltip, Toast, Button } = window.CashflowDesignSystem_2cf89d;
+  const { Dialog, DropdownMenu, Tooltip, Toast, Button } = window.CashflowDesignSystem_2cf89d;
   function Demo() {
     const [open, setOpen] = React.useState(false);
     return (
@@ -36,6 +36,10 @@
           <Toast variant="success" title="Statement imported" onClose={() => {}}>312 transactions added from Amex Cobalt.</Toast>
           <Toast variant="error" title="Sync failed" onClose={() => {}}>Couldn’t reach TD. We’ll retry shortly.</Toast>
         </div>
+        {/* The Dialog portals to document.body, locks page scroll, traps Tab, and
+            restores focus to the trigger on close. Escape runs through the shared
+            dismiss stack: with the category menu open, the first Escape closes just
+            the menu and the Dialog stays put. */}
         <Dialog
           open={open}
           onClose={() => setOpen(false)}
@@ -46,7 +50,19 @@
             <Button variant="destructive" onClick={() => setOpen(false)}>Delete</Button>
           </>}
         >
-          Whole Foods Market · −$84.20 · Groceries
+          <div className="row">
+            <span>Whole Foods Market · −$84.20</span>
+            <DropdownMenu
+              align="end"
+              trigger={<Button variant="secondary" size="sm">Groceries ▾</Button>}
+              items={[
+                { label: 'Groceries', onSelect: () => {} },
+                { label: 'Dining', onSelect: () => {} },
+                { separator: true },
+                { label: 'Uncategorize', danger: true, onSelect: () => {} },
+              ]}
+            />
+          </div>
         </Dialog>
       </div>
     );
