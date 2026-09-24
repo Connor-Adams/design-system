@@ -1,0 +1,78 @@
+/* StatGrid — the KPI row container. The whole grid is expressed here and keyed
+   off data-columns / data-gap / data-divided; the .tsx only hands in the two
+   per-instance custom properties (--ca-stat-grid-min, --ca-stat-grid-columns).
+   Responsiveness is intrinsic (auto-fit + minmax), so there are no media
+   queries and nothing to compute in JS. Gutters step the --space-* ladder. */
+
+.ca-stat-grid {
+  /* Gutter default; each data-gap step below overrides it. */
+  --ca-stat-grid-gap: var(--space-3);
+
+  display: grid;
+  /* Auto-fit is the default: tracks at least --ca-stat-grid-min wide, wrapping
+     on their own. min(100%, …) is the mobile floor — it keeps a single track
+     from overflowing a container narrower than the minimum. */
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--ca-stat-grid-min, 180px)), 1fr));
+  gap: var(--ca-stat-grid-gap);
+  font-family: var(--font-sans);
+}
+
+/* A fixed track count. minmax(0, 1fr) rather than 1fr so a long value in one
+   cell can't blow its track out past its share. */
+.ca-stat-grid:not([data-columns='auto']) {
+  grid-template-columns: repeat(var(--ca-stat-grid-columns, 1), minmax(0, 1fr));
+}
+
+.ca-stat-grid[data-gap='none'] {
+  --ca-stat-grid-gap: 0;
+}
+.ca-stat-grid[data-gap='sm'] {
+  --ca-stat-grid-gap: var(--space-2);
+}
+.ca-stat-grid[data-gap='md'] {
+  --ca-stat-grid-gap: var(--space-3);
+}
+.ca-stat-grid[data-gap='lg'] {
+  --ca-stat-grid-gap: var(--space-4);
+}
+
+/* ── divided: the dense KPI strip ─────────────────────────────────────────
+   One outer card, hairlines between the cells instead of a gutter. */
+.ca-stat-grid[data-divided='true'] {
+  --ca-stat-grid-gap: 0;
+
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--card);
+}
+
+/* The interior rules: an outset hairline on each cell's left and top edge.
+   This needs no :nth-child math, so it survives auto-fit's unknown (and
+   viewport-dependent) column count — the first row's top rules and the first
+   column's left rules fall outside the container's padding box and are clipped
+   by `overflow: hidden`, leaving only the interior ones. It also replaces any
+   elevation a cell drew for itself, which a strip shouldn't have. */
+.ca-stat-grid[data-divided='true'] > * {
+  box-shadow:
+    -1px 0 0 0 var(--border),
+    0 -1px 0 0 var(--border);
+}
+
+/* Cells bring their own padding — a StatCard already does. But it also draws
+   its own border, radius and background, which would double up against the
+   separators, so flatten a StatCard cell to the same shell `<StatCard bare>`
+   renders. Direct children only: a StatCard nested deeper inside a cell is the
+   consumer's own composition and is left alone. */
+.ca-stat-grid[data-divided='true'] > .ca-stat-card {
+  border-color: transparent;
+  border-radius: 0;
+  background: transparent;
+}
+
+/* Not focusable by default, but a consumer can make the strip a tab stop
+   (tabIndex, role="group"); give it the standard ring when they do. */
+.ca-stat-grid:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}

@@ -20,6 +20,7 @@ import {
   type DataTableSort,
   LetterAvatar,
   StatCard,
+  StatGrid,
   Table, TableHeader, TableBody, TableRow, TableHead, TableCell,
   Tabs,
   // feedback
@@ -739,6 +740,32 @@ export const previews: Record<string, Variant[]> = {
         <StatCard label="Total Spending" value="$3,240.00" delta="+$340" metricKind="spend" />
         <StatCard label="Total Income" value="$8,500.00" delta="+$650" metricKind="gain" hint="vs. last month" />
       </div>
+    )},
+  ],
+
+  'stat-grid': [
+    { label: 'Auto-fit', node: (
+      <StatGrid>
+        <StatCard label="Net spend" value="$4,210" hint="This month" delta="-8%" metricKind="spend" />
+        <StatCard label="Income" value="$9,800" hint="vs last month" delta="+3%" metricKind="gain" />
+        <StatCard label="Net savings" value="$2,180" hint="After expenses" delta="+12%" metricKind="gain" />
+        <StatCard label="Transactions" value="312" hint="Current filters" delta="+24" metricKind="neutral" />
+      </StatGrid>
+    )},
+    { label: 'Fixed columns', node: (
+      <StatGrid columns={3} gap="lg">
+        <StatCard label="Net spend" value="$4,210" delta="-8%" metricKind="spend" />
+        <StatCard label="Income" value="$9,800" delta="+3%" metricKind="gain" />
+        <StatCard label="Transactions" value="312" delta="+24" metricKind="neutral" />
+      </StatGrid>
+    )},
+    { label: 'Divided', node: (
+      <StatGrid columns={4} divided>
+        <StatCard label="Net spend" value="$4,210" delta="-8%" metricKind="spend" />
+        <StatCard label="Income" value="$9,800" delta="+3%" metricKind="gain" />
+        <StatCard label="Net savings" value="$2,180" delta="+12%" metricKind="gain" />
+        <StatCard label="Transactions" value="312" delta="+24" metricKind="neutral" />
+      </StatGrid>
     )},
   ],
 
