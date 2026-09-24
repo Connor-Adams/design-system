@@ -25,6 +25,11 @@
     "category": "core"
   },
   {
+    "slug": "icon",
+    "name": "Icon",
+    "category": "core"
+  },
+  {
     "slug": "kbd",
     "name": "Kbd",
     "category": "core"

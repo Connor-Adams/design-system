@@ -49,7 +49,7 @@ export function buildInventory({ manifest, props, usage, version, base, categori
   for (const cat of usedCats) {
     llmsTxt += `\n## ${cap(cat)}\n`
     for (const m of components.filter((x) => x.category === cat)) {
-      const names = (m.props ?? []).slice(0, 6).map((p) => p.name)
+      const names = (m.props ?? []).map((p) => p.name)
       const propStr = names.length ? ` Props: ${names.join(', ')}.` : ''
       const summary = m.summary.replace(/\.$/, '')
       llmsTxt += `- [${m.name}](${m.docs}): ${summary}.${propStr}\n`
