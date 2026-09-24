@@ -39,6 +39,11 @@ One-line: Cashflow's data-display set — StatCard (money-aware KPI), StatGrid (
 />
 
 <Tabs items={[{value:'all',label:'All'},{value:'biz',label:'Business'}]} value={tab} onValueChange={setTab} />
+{/* long bar: one scrolling row instead of wrapping onto several */}
+<Tabs items={manyTabs} value={tab} onValueChange={setTab} overflow="scroll" />
+{/* own your panels: panelId -> aria-controls, tabId -> the panel's aria-labelledby */}
+<Tabs items={[{value:'all',label:'All',tabId:'tab-all',panelId:'panel-all'}]} value={tab} onValueChange={setTab} />
+<div id="panel-all" role="tabpanel" aria-labelledby="tab-all">…</div>
 <LetterAvatar text="Whole Foods" size="md" />
 ```
 
@@ -49,3 +54,7 @@ DataTable vs Table: reach for `DataTable` whenever the shape is "columns + rows"
 CRITICAL — DataTable sorting is *controlled and presentational*: it renders the keyboard-operable sort button and the correct `aria-sort`, then calls `onSortChange` with the next state (asc → desc → cleared). **It never reorders `rows` for you** — sort the data yourself. `getRowKey` is required on purpose; keying by array index corrupts row state as soon as anything sorts, filters or paginates. `columns[].key` must name a real field of the row type unless that column supplies a `render`.
 
 StatGrid props: `columns` (a number, or `'auto'` — the default auto-fit grid) · `minItemWidth` (auto-fit track minimum, number = px, default 180) · `gap` `none|sm|md|lg` (the `--space-*` ladder, default `md`) · `divided` (hairline separators instead of gutters, one outer card). Responsiveness is intrinsic — `columns="auto"` wraps by itself, so don't add breakpoints around it. It accepts **any** children and never touches them; a `StatCard` directly inside a `divided` grid has its own shell flattened automatically, and `<StatCard bare>` does the same thing anywhere else something else already draws the container.
+
+Tabs: controlled navigation semantics — always exactly one selected, `role="tablist"` + `role="tab"` + `aria-selected`, full keyboard pattern (ArrowLeft/ArrowRight wrap, Home, End) with a roving tabindex and **automatic activation** (arrowing selects). Horizontal only. `overflow` is `'wrap'` (default, multi-row) or `'scroll'` (one row, snap, faded edges, selected pill auto-scrolled into view, reduced-motion aware) — reach for `'scroll'` instead of wrapping Tabs in your own `overflow-x-auto` div. Tabs renders the tablist ONLY; panels are yours, wired via per-item `panelId`/`tabId`.
+
+Tabs vs ToggleGroup: Tabs = navigation (one always selected, switches a view). ToggleGroup = form input (`role="group"` + `aria-pressed`, deselectable, `type="multiple"`, has `size` and per-item `icon`). Don't use Tabs for a filter you can clear.
