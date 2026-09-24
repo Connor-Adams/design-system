@@ -93,7 +93,17 @@ export type { DialogProps } from './overlays/Dialog'
 export { DropdownMenu } from './overlays/DropdownMenu'
 export type { DropdownMenuProps, DropdownItem } from './overlays/DropdownMenu'
 export { Toast } from './overlays/Toast'
-export type { ToastProps } from './overlays/Toast'
+export type { ToastProps, ToastVariant } from './overlays/Toast'
+export { Toaster, toast, toastStore, useToast } from './overlays/Toaster'
+export type {
+  ToasterProps,
+  ToasterPosition,
+  ToastOptions,
+  ToastRecord,
+  ToastHelperOptions,
+  ToastFn,
+  UseToastReturn,
+} from './overlays/Toaster'
 export { Tooltip } from './overlays/Tooltip'
 export type { TooltipProps } from './overlays/Tooltip'
 export type { MediaTrack } from './media/types'

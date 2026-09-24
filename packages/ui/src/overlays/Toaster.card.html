@@ -1,0 +1,65 @@
+<!-- @dsCard group="Components" viewport="700x420" name="Toaster" subtitle="Portalled toast host — auto-dismiss, stacking, toast() from anywhere" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="../../styles.css" />
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script>
+<style>
+<style>
+  body { margin: 0; padding: 20px; background: var(--card); }
+  .wrap { display: flex; flex-direction: column; gap: 14px; max-width: 620px; }
+  .row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .note { margin: 0; font-size: var(--text-body-sm); color: var(--muted-foreground); line-height: 1.5; }
+  /* The card is the stage. The Toaster portals, so `container` points it here
+     and `transform` establishes the containing block for its position:fixed stack. */
+  .stage { position: relative; height: 200px; overflow: hidden; border: 1px dashed var(--border); border-radius: var(--radius-md); transform: translateZ(0); }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+  const { Toaster, toast, useToast, Button } = window.CashflowDesignSystem_2cf89d;
+
+  function Demo() {
+    const { toasts } = useToast();
+    const [stage, setStage] = React.useState(null);
+    return (
+      <div className="wrap">
+        <div className="row">
+          <Button variant="secondary" size="sm" onClick={() => toast.success('Statement imported', { description: '312 transactions added from Amex Cobalt.' })}>Success</Button>
+          <Button variant="secondary" size="sm" onClick={() => toast.error('Sync failed', { description: 'Couldn’t reach TD. We’ll retry shortly.' })}>Error</Button>
+          <Button variant="secondary" size="sm" onClick={() => toast.warning('Budget exceeded', { description: 'Dining is $24 over for July.' })}>Warning</Button>
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => toast({
+              title: 'Transaction deleted',
+              description: 'Whole Foods Market · −$84.20',
+              duration: Infinity,
+              action: <Button variant="ghost" size="sm" onClick={() => toast.success('Restored')}>Undo</Button>,
+            })}
+          >
+            Persistent + Undo
+          </Button>
+          <Button variant="ghost" size="sm" onClick={() => toast.dismiss()}>Dismiss all</Button>
+        </div>
+        <p className="note">
+          One <code>&lt;Toaster /&gt;</code> hosts the stack; <code>toast()</code> is called straight from these
+          handlers — no provider, no hook. Queue length: <strong>{toasts.length}</strong>. Auto-dismiss pauses while
+          the stack is hovered or holds focus, and <code>error</code> announces as an assertive alert.
+        </p>
+        <div className="stage" ref={setStage}>
+          {stage && <Toaster position="bottom-right" max={3} container={stage} />}
+        </div>
+      </div>
+    );
+  }
+  ReactDOM.createRoot(document.getElementById('root')).render(<Demo />);
+</script>
+</body>
+</html>

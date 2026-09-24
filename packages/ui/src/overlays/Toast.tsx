@@ -3,16 +3,32 @@ import './Toast.css'
 
 /**
  * Toast notification — a popover card with a semantic left accent. Presentational:
- * manage timing/stacking yourself. `onClose` renders a dismiss button.
+ * for timing, stacking, positioning and a portal, mount `Toaster` and fire
+ * `toast()`. Use `Toast` directly only when you are driving visibility from your
+ * own state. `onClose` renders a dismiss button.
  *
  * Visuals live in `Toast.css`, keyed off `data-variant`. The dismiss button
  * carries a `:focus-visible` ring for keyboard users.
  */
+
+/** Semantic tone of the toast. Drives the accent colour and the ARIA urgency. */
+export type ToastVariant = 'default' | 'success' | 'error' | 'warning' | 'info'
+
 export interface ToastProps {
-  variant?: 'default' | 'success' | 'error' | 'warning' | 'info'
+  variant?: ToastVariant
   title?: React.ReactNode
   action?: React.ReactNode
   onClose?: () => void
+  /**
+   * ARIA role. Derived from `variant` when omitted: `'alert'` for `error`,
+   * `'status'` otherwise. Override to force one either way.
+   */
+  role?: 'status' | 'alert'
+  /**
+   * Live-region politeness. Derived from `variant` when omitted: `'assertive'`
+   * for `error`, `'polite'` otherwise. Override to force one either way.
+   */
+  'aria-live'?: 'polite' | 'assertive' | 'off'
   className?: string
   style?: React.CSSProperties
   children?: React.ReactNode
@@ -20,18 +36,36 @@ export interface ToastProps {
 
 /**
  * Cashflow Toast. A --popover card with a semantic left accent bar, title,
- * optional body, and a close affordance. Presentational — drive show/hide and
- * stacking from your own state or a Toaster container.
+ * optional body, and a close affordance.
+ *
+ * A failure is urgent and a confirmation is not, so the live-region strength is
+ * derived from `variant` rather than fixed: `error` announces as
+ * `alert`/`assertive` and interrupts, every other variant stays
+ * `status`/`polite`. Pass `role` / `aria-live` to override.
+ *
+ * Presentational — `Toaster` drives show/hide, stacking and auto-dismiss.
  */
 export const Toast = React.forwardRef<HTMLDivElement, ToastProps>(function Toast(
-  { variant = 'default', title, action, onClose, className, style, children, ...props },
+  {
+    variant = 'default',
+    title,
+    action,
+    onClose,
+    role,
+    'aria-live': ariaLive,
+    className,
+    style,
+    children,
+    ...props
+  },
   ref,
 ): React.JSX.Element {
+  const urgent = variant === 'error'
   return (
     <div
       ref={ref}
-      role="status"
-      aria-live="polite"
+      role={role ?? (urgent ? 'alert' : 'status')}
+      aria-live={ariaLive ?? (urgent ? 'assertive' : 'polite')}
       data-slot="toast"
       data-variant={variant}
       className={className ? `ca-toast ${className}` : 'ca-toast'}
