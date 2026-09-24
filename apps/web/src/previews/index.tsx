@@ -15,6 +15,7 @@ import {
   Spinner,
   Text,
   // data
+  ChartFrame,
   LetterAvatar,
   StatCard,
   Table, TableHeader, TableBody, TableRow, TableHead, TableCell,
@@ -53,12 +54,32 @@ import {
   DropdownMenu,
   Toast,
   Tooltip,
+  // chart palette (also published CSS-free at '@connor-adams/designsystem/chart')
+  chartColor,
+  chartColors,
+  chartTheme,
 } from '@connor-adams/designsystem'
 
 // ---------------------------------------------------------------------------
 // Controlled wrappers — defined as named function components so hooks are valid
 // (module is already 'use client')
 // ---------------------------------------------------------------------------
+
+// Stand-in for a consuming app's chart. ChartFrame is chart-library agnostic —
+// packages/ui takes no npm deps — so the gallery draws plain SVG whose fills
+// come from the palette export. `var(--chart-N)` resolves in an SVG
+// presentation attribute, so these bars follow the theme with no JS.
+function FakeBars({ count = 10 }: { count?: number }): React.JSX.Element {
+  const values = Array.from({ length: count }, (_, i) => 28 + ((i * 37) % 66))
+  return (
+    <svg width="100%" height="100%" viewBox={`0 0 ${count * 40} 100`} preserveAspectRatio="none">
+      {values.map((v, i) => (
+        <rect key={i} x={i * 40 + 8} y={100 - v} width={24} height={v} rx={2} fill={chartColor(i)} />
+      ))}
+      <line x1="0" y1="99.5" x2={count * 40} y2="99.5" stroke={chartTheme.axis.stroke} />
+    </svg>
+  )
+}
 
 function TabsPreview(): React.JSX.Element {
   const [value, setValue] = React.useState('month')
@@ -276,6 +297,68 @@ export const previews: Record<string, Variant[]> = {
   ],
 
   // --- data -----------------------------------------------------------------
+  'chart-frame': [
+    { label: 'Default', node: (
+      <ChartFrame
+        title="Spend by month"
+        subtitle="Last 12 months, all accounts"
+        height={220}
+        style={{ width: '100%' }}
+      >
+        <FakeBars count={12} />
+      </ChartFrame>
+    )},
+    { label: 'Header actions + footer', node: (
+      <ChartFrame
+        title="Cash flow"
+        subtitle="Net of transfers"
+        height={200}
+        actions={<><Badge variant="secondary">Monthly</Badge><Button variant="ghost" size="sm">Export</Button></>}
+        footer="Source: imported ledger"
+        style={{ width: '100%' }}
+      >
+        <FakeBars count={10} />
+      </ChartFrame>
+    )},
+    { label: 'Auto height from rowCount', node: (
+      <ChartFrame
+        title="Spend by category"
+        subtitle="14 rows · height = rowCount × rowHeight, clamped"
+        height="auto"
+        rowCount={14}
+        rowHeight={24}
+        minHeight={180}
+        maxHeight={420}
+        style={{ width: '100%' }}
+      >
+        <FakeBars count={14} />
+      </ChartFrame>
+    )},
+    { label: 'Palette export', node: (
+      <ChartFrame
+        title="Chart palette"
+        subtitle="chartColors — every value is a var(--token) string"
+        height={180}
+        style={{ width: '100%' }}
+      >
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10, height: '100%' }}>
+          {([
+            ['categorical', chartColors.categorical],
+            ['line', chartColors.line],
+            ['domain', Object.values(chartColors.domain)],
+          ] as Array<[string, readonly string[]]>).map(([label, ramp]) => (
+            <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span style={{ width: 84, fontSize: 'var(--text-body-sm)', color: 'var(--muted-foreground)' }}>{label}</span>
+              {ramp.map((c) => (
+                <span key={c} title={c} style={{ width: 36, height: 28, borderRadius: 'var(--radius-md)', background: c, border: '1px solid var(--border)' }} />
+              ))}
+            </div>
+          ))}
+        </div>
+      </ChartFrame>
+    )},
+  ],
+
   'letter-avatar': [
     { label: 'Sizes', node: (
       <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>

@@ -1,8 +1,23 @@
 // Side-effect import of the layered stylesheet entry (tokens as `base`,
 // component CSS as `components`) so a single
 // `import { ... } from '@connor-adams/designsystem'` pulls in all styling.
-// The actual file is re-attached to the built JS entry via tsup's `banner`
-// (see tsup.config.ts) — this import here only documents the dependency.
+// The actual file is re-attached to this built entry (and only this one) in
+// tsup's `onSuccess` — see tsup.config.ts — so the `./chart` entry can stay
+// stylesheet-free. This comment only documents the dependency.
+
+// Chart palette + frame theme as CSS var() strings. Also published on its own
+// at `@connor-adams/designsystem/chart`, which is the import to use when you
+// only want the palette — that entry carries no stylesheet side-effect.
+export { chartColors, chartTheme, chartColor, chartLineColor } from './chart'
+export type {
+  ChartColors,
+  ChartTheme,
+  ChartColorToken,
+  ChartDomainColors,
+  ChartAxisTheme,
+  ChartGridTheme,
+  ChartTooltipTheme,
+} from './chart'
 
 export { Button } from './core/Button'
 export type { ButtonProps, ButtonVariant, ButtonSize } from './core/Button'
@@ -28,6 +43,8 @@ export { Spinner } from './core/Spinner'
 export type { SpinnerProps } from './core/Spinner'
 export { Text } from './core/Text'
 export type { TextProps, TextTone, TextVariant, TextWeight } from './core/Text'
+export { ChartFrame, resolveChartHeight } from './data/ChartFrame'
+export type { ChartFrameProps, ChartFrameHeight, ChartFramePadding, ChartHeightSpec } from './data/ChartFrame'
 export { LetterAvatar } from './data/LetterAvatar'
 export type { LetterAvatarProps, LetterAvatarSize } from './data/LetterAvatar'
 export { resolveDeltaTone, StatCard } from './data/StatCard'
