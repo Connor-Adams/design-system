@@ -30,6 +30,7 @@
   --rb-blue-500: #3b82f6;
   --rb-violet-400: #a78bfa;
   --rb-violet-500: #8b5cf6;
+  --rb-pink-300: #f9a8d4;
   --rb-pink-400: #f472b6;
   --rb-pink-500: #ec4899;
 
@@ -39,10 +40,15 @@
   --primary-foreground: #ffffff;
   --ring: var(--rb-blue-500);
 
-  /* Accent is Rainbot's third hue, used as a real accent rather than
-   * Cashflow's subtle tinted fill. */
-  --accent: var(--rb-pink-500);
-  --accent-foreground: #ffffff;
+  /* --accent is NOT "the third brand hue" -- it is the subtle hover FILL for
+   * outline and ghost buttons (Button.css uses `background: var(--accent)` on
+   * both). Cashflow points it at --oxblood-900 in dark for exactly that reason.
+   * Setting it to full-saturation pink makes every outline/ghost button hover
+   * to a solid hot-pink block, which is why this is a dark pink tint and not
+   * --rb-pink-500. Rainbot's vivid pink lives in --gradient-hero-to and
+   * --chart-3, where a saturated hue is actually wanted. */
+  --accent: #3a1024;
+  --accent-foreground: var(--rb-pink-300);
 
   /* Links are a visible blue here. Cashflow deliberately keeps them neutral
    * (foreground + underline on hover); Rainbot is a dashboard, not prose. */

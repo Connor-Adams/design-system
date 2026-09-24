@@ -154,18 +154,34 @@ re-point any of them. This is the whole knob surface:
 | Elevation | `spacing.css` | `--shadow` (light and dark variants) |
 | Type | `typography.css` | `--font-sans`, `--font-mono`, `--leading-base`, `--weight-regular/medium/semibold/bold`, the full `--text-*` scale with its `-lh`/`-ls` pairs, `--text-label` |
 
-Semantic names carry meaning, not just a value. `--secondary` is a quiet neutral
-chip surface, not "the second brand hue" — re-pointing it at a saturated colour
-makes every `<Button variant="secondary">` loud. Use `--accent` for a second hue.
+Semantic names carry meaning, not just a value, and the meaning is whatever the
+component CSS actually does with them — check before you re-point one. `--accent`
+is the worked example: it reads like "the accent hue", but `Button.css` uses it as
+the hover *fill* for `outline` and `ghost`, so pointing it at a saturated colour
+makes those buttons hover to a solid block of it. Grep `packages/ui/src` for
+`var(--<token>)` before assuming.
+
+The inverse trap is just as real: `--secondary` is defined in both theme blocks
+and consumed by **no component CSS at all** (`Button[data-variant='secondary']`
+reads `--card` / `--foreground` / `--border`). Re-pointing it changes nothing,
+and reasoning about what it "would" do is wasted effort.
+
 If a brand does diverge on what a name means, say so in a comment in the brand
 file.
 
 ### Known limits
 
 Some components hard-code values a brand cannot reach. These are bugs, not
-design: `Card`'s `padding: 20px` (`Card.css`), `Progress`'s `4/8/12px` size
-ramp, `Sparkline`'s fixed pixel dimensions, and `CategoryBreakdown`'s inlined
+design: `Sparkline`'s fixed pixel dimensions and `CategoryBreakdown`'s inlined
 `BAR_GRADIENT` constant. Prefer a token or a prop when you touch them.
+
+The radius ladder stops at `--radius-xl` (12px), so a 16px card corner has no
+token — `Card`'s `radius` prop tops out there too.
+
+`--shadow` lives in `spacing.css`, not `semantic.css`, and has its own
+`[data-theme="dark"]` override. A brand that does not name it inherits the
+active theme's elevation, so a dark-only brand paired with the light theme is
+noticeably under-elevated across the 17 component CSS files that read it.
 
 ---
 
