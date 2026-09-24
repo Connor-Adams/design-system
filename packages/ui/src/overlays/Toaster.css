@@ -1,0 +1,148 @@
+/* Toaster — the fixed, portalled stack that hosts Toasts. Positioning, stacking
+   direction and the enter/exit animation live here, keyed off data-position and
+   data-state; the JS only owns timers. All colors reach through the semantic
+   token layer; no raw hex. */
+
+.ca-toaster {
+  position: fixed;
+  z-index: 80; /* above Dialog (50), Tooltip (60), DropdownMenu (70) */
+  display: flex;
+  flex-direction: column;
+  gap: var(--ca-toaster-gap, 10px);
+  width: max-content;
+  max-width: min(calc(100vw - 32px), 380px);
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-sans);
+  /* The stack itself must not swallow clicks on the page behind it; the toasts do. */
+  pointer-events: none;
+}
+
+.ca-toaster > * {
+  pointer-events: auto;
+}
+
+/* ---- Placement (keyed off data-position) ----
+   Bottom stacks run column-reverse so the newest toast sits closest to the
+   screen edge and older ones push upward. */
+.ca-toaster[data-position='top-left'] {
+  top: 16px;
+  left: 16px;
+  align-items: flex-start;
+}
+.ca-toaster[data-position='top-center'] {
+  top: 16px;
+  left: 50%;
+  align-items: center;
+  transform: translateX(-50%);
+}
+.ca-toaster[data-position='top-right'] {
+  top: 16px;
+  right: 16px;
+  align-items: flex-end;
+}
+.ca-toaster[data-position='bottom-left'] {
+  bottom: 16px;
+  left: 16px;
+  align-items: flex-start;
+  flex-direction: column-reverse;
+}
+.ca-toaster[data-position='bottom-center'] {
+  bottom: 16px;
+  left: 50%;
+  align-items: center;
+  transform: translateX(-50%);
+  flex-direction: column-reverse;
+}
+.ca-toaster[data-position='bottom-right'] {
+  bottom: 16px;
+  right: 16px;
+  align-items: flex-end;
+  flex-direction: column-reverse;
+}
+
+/* ---- Overflow count ---- */
+.ca-toaster-overflow {
+  align-self: center;
+  background: var(--muted);
+  color: var(--muted-foreground);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  padding: 2px 10px;
+  font-size: var(--text-body-sm);
+  font-weight: var(--weight-medium);
+  white-space: nowrap;
+}
+
+/* ---- Enter / exit ----
+   Durations pair with EXIT_MS in Toaster.tsx: the record is held in the queue
+   long enough for the out animation to finish. */
+.ca-toaster-item {
+  animation: ca-toaster-in-bottom 200ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.ca-toaster[data-position^='top'] .ca-toaster-item {
+  animation-name: ca-toaster-in-top;
+}
+
+.ca-toaster-item[data-state='exiting'] {
+  pointer-events: none;
+  animation: ca-toaster-out-bottom 180ms ease-in both;
+}
+
+.ca-toaster[data-position^='top'] .ca-toaster-item[data-state='exiting'] {
+  animation-name: ca-toaster-out-top;
+}
+
+@keyframes ca-toaster-in-bottom {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes ca-toaster-in-top {
+  from {
+    opacity: 0;
+    transform: translateY(-12px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes ca-toaster-out-bottom {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+}
+
+@keyframes ca-toaster-out-top {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.98);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ca-toaster-item,
+  .ca-toaster[data-position^='top'] .ca-toaster-item,
+  .ca-toaster-item[data-state='exiting'],
+  .ca-toaster[data-position^='top'] .ca-toaster-item[data-state='exiting'] {
+    animation: none;
+  }
+}

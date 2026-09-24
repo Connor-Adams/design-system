@@ -28,8 +28,39 @@ describe('Toast', () => {
   })
 
   it('reflects variant as a data attribute', () => {
-    render(<Toast variant="error" title="Oops" />)
-    expect(screen.getByRole('status')).toHaveAttribute('data-variant', 'error')
+    render(<Toast variant="warning" title="Careful" />)
+    expect(screen.getByRole('status')).toHaveAttribute('data-variant', 'warning')
+  })
+
+  it('announces politely as a status by default', () => {
+    render(<Toast title="Saved" />)
+    const el = screen.getByRole('status')
+    expect(el).toHaveAttribute('aria-live', 'polite')
+  })
+
+  it('escalates the error variant to an assertive alert', () => {
+    render(<Toast variant="error" title="Sync failed" />)
+    const el = screen.getByRole('alert')
+    expect(el).toHaveAttribute('aria-live', 'assertive')
+    expect(el).toHaveAttribute('data-variant', 'error')
+    expect(screen.queryByRole('status')).toBeNull()
+  })
+
+  it('keeps every non-error variant polite', () => {
+    for (const variant of ['default', 'success', 'warning', 'info'] as const) {
+      const { unmount } = render(<Toast variant={variant} title="Hi" />)
+      expect(screen.getByRole('status')).toHaveAttribute('aria-live', 'polite')
+      unmount()
+    }
+  })
+
+  it('lets an explicit role and aria-live override the derived pair', () => {
+    const { unmount } = render(<Toast variant="error" title="Quietly" role="status" aria-live="polite" />)
+    const el = screen.getByRole('status')
+    expect(el).toHaveAttribute('aria-live', 'polite')
+    unmount()
+    render(<Toast variant="info" title="Loudly" role="alert" aria-live="assertive" />)
+    expect(screen.getByRole('alert')).toHaveAttribute('aria-live', 'assertive')
   })
 
   it('defaults variant to "default"', () => {

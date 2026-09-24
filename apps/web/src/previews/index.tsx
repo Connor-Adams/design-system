@@ -53,6 +53,9 @@ import {
   Dialog,
   DropdownMenu,
   Toast,
+  Toaster,
+  toast,
+  useToast,
   Tooltip,
   useConfirm,
 } from '@connor-adams/designsystem'
@@ -98,6 +101,68 @@ function TabsPreview(): React.JSX.Element {
       value={value}
       onValueChange={setValue}
     />
+  )
+}
+
+function ToasterPreview(): React.JSX.Element {
+  // The Toaster portals to document.body by default; point `container` at this
+  // cell (and give it a containing block) so the fixed stack stays in the gallery.
+  const [stage, setStage] = React.useState<HTMLDivElement | null>(null)
+  const { toasts } = useToast()
+  const btn: React.CSSProperties = {
+    padding: '6px 12px',
+    border: '1px solid var(--border)',
+    borderRadius: 'var(--radius-md)',
+    background: 'var(--card)',
+    color: 'var(--foreground)',
+    font: 'inherit',
+    cursor: 'pointer',
+  }
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+        <button
+          type="button"
+          style={btn}
+          onClick={() => toast.success('Statement imported', { description: '312 transactions added.' })}
+        >
+          Success
+        </button>
+        <button
+          type="button"
+          style={btn}
+          onClick={() => toast.error('Sync failed', { description: 'Couldn\u2019t reach TD. We\u2019ll retry shortly.' })}
+        >
+          Error
+        </button>
+        <button
+          type="button"
+          style={btn}
+          onClick={() => toast({ title: 'Transaction deleted', duration: Infinity })}
+        >
+          Persistent
+        </button>
+        <button type="button" style={btn} onClick={() => toast.dismiss()}>
+          Dismiss all
+        </button>
+      </div>
+      <div
+        ref={setStage}
+        style={{
+          position: 'relative',
+          height: 200,
+          overflow: 'hidden',
+          border: '1px dashed var(--border)',
+          borderRadius: 'var(--radius-md)',
+          transform: 'translateZ(0)',
+        }}
+      >
+        {stage && <Toaster position="bottom-right" max={3} container={stage} />}
+      </div>
+      <p style={{ margin: 0, fontSize: 'var(--text-body-sm)', color: 'var(--muted-foreground)' }}>
+        Queue length: {toasts.length}. One host, one module-level store — <code>toast()</code> works from anywhere.
+      </p>
+    </div>
   )
 }
 
@@ -952,6 +1017,8 @@ export const previews: Record<string, Variant[]> = {
       </div>
     )},
   ],
+
+  toaster: [{ label: 'Interactive', node: <ToasterPreview /> }],
 
   tooltip: [
     { label: 'Example', node: (
