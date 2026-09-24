@@ -1,6 +1,6 @@
 {
   "name": "@connor-adams/tokens",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Design tokens (CSS custom properties) for the Connor Adams design system.",
   "license": "SEE LICENSE FILE",
   "type": "module",
