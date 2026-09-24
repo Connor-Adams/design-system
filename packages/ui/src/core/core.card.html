@@ -1,4 +1,4 @@
-<!-- @dsCard group="Components" viewport="700x300" name="Core — Button, Badge, Card" subtitle="Oxblood primary, neutral variants, brand pills" -->
+<!-- @dsCard group="Components" viewport="700x440" name="Core — Button, Badge, Card" subtitle="Oxblood primary, neutral variants, brand pills, status dots" -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -46,9 +46,36 @@
             <Badge>Active</Badge>
             <Badge variant="secondary">CAD</Badge>
             <Badge variant="success">Reconciled</Badge>
+            <Badge variant="warning">Due soon</Badge>
+            <Badge variant="info">Heads up</Badge>
             <Badge variant="outline">Pending</Badge>
             <Badge variant="destructive">Flagged</Badge>
             <Badge variant="count">12</Badge>
+          </div>
+        </div>
+        <div>
+          <p className="cap">Badge sizes &middot; sm</p>
+          <div className="row">
+            <Badge size="sm">Active</Badge>
+            <Badge size="sm" variant="secondary">CAD</Badge>
+            <Badge size="sm" variant="success">Reconciled</Badge>
+            <Badge size="sm" variant="warning">Due soon</Badge>
+            <Badge size="sm" variant="info">Heads up</Badge>
+            <Badge size="sm" variant="outline">Pending</Badge>
+            <Badge size="sm" variant="destructive">Flagged</Badge>
+            <Badge size="sm" variant="count">12</Badge>
+          </div>
+        </div>
+        <div>
+          <p className="cap">Badge status dot &amp; pulse</p>
+          <div className="row">
+            <Badge variant="success" dot>Connected</Badge>
+            <Badge variant="warning" dot>Degraded</Badge>
+            <Badge variant="info" dot>Streaming</Badge>
+            <Badge variant="outline" dot>Idle</Badge>
+            <Badge variant="success" pulse>Live</Badge>
+            <Badge variant="destructive" pulse>Disconnected</Badge>
+            <Badge variant="success" size="sm" pulse>Live</Badge>
           </div>
         </div>
         <Card style={{ maxWidth: 320 }}>

@@ -128,9 +128,68 @@ export const previews: Record<string, Variant[]> = {
         <Badge>Default</Badge>
         <Badge variant="secondary">Secondary</Badge>
         <Badge variant="success">Paid</Badge>
+        <Badge variant="warning">Due soon</Badge>
+        <Badge variant="info">Heads up</Badge>
         <Badge variant="destructive">Overdue</Badge>
         <Badge variant="outline">Pending</Badge>
         <Badge variant="count">12</Badge>
+      </div>
+    )},
+    { label: 'Sizes', node: (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+          <Badge size="default">Default</Badge>
+          <Badge size="default" variant="secondary">Secondary</Badge>
+          <Badge size="default" variant="success">Paid</Badge>
+          <Badge size="default" variant="warning">Due soon</Badge>
+          <Badge size="default" variant="info">Heads up</Badge>
+          <Badge size="default" variant="destructive">Overdue</Badge>
+          <Badge size="default" variant="outline">Pending</Badge>
+          <Badge size="default" variant="count">12</Badge>
+        </div>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+          <Badge size="sm">Default</Badge>
+          <Badge size="sm" variant="secondary">Secondary</Badge>
+          <Badge size="sm" variant="success">Paid</Badge>
+          <Badge size="sm" variant="warning">Due soon</Badge>
+          <Badge size="sm" variant="info">Heads up</Badge>
+          <Badge size="sm" variant="destructive">Overdue</Badge>
+          <Badge size="sm" variant="outline">Pending</Badge>
+          <Badge size="sm" variant="count">12</Badge>
+        </div>
+      </div>
+    )},
+    { label: 'Status dot', node: (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+          <Badge dot>Default</Badge>
+          <Badge variant="secondary" dot>Secondary</Badge>
+          <Badge variant="success" dot>Connected</Badge>
+          <Badge variant="warning" dot>Degraded</Badge>
+          <Badge variant="info" dot>Streaming</Badge>
+          <Badge variant="destructive" dot>Down</Badge>
+          <Badge variant="outline" dot>Idle</Badge>
+          <Badge variant="count" dot>12</Badge>
+        </div>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+          <Badge size="sm" dot>Default</Badge>
+          <Badge size="sm" variant="secondary" dot>Secondary</Badge>
+          <Badge size="sm" variant="success" dot>Connected</Badge>
+          <Badge size="sm" variant="warning" dot>Degraded</Badge>
+          <Badge size="sm" variant="info" dot>Streaming</Badge>
+          <Badge size="sm" variant="destructive" dot>Down</Badge>
+          <Badge size="sm" variant="outline" dot>Idle</Badge>
+          <Badge size="sm" variant="count" dot>12</Badge>
+        </div>
+      </div>
+    )},
+    { label: 'Pulse', node: (
+      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+        <Badge variant="success" pulse>Live</Badge>
+        <Badge variant="warning" pulse>Syncing</Badge>
+        <Badge variant="info" pulse>Streaming</Badge>
+        <Badge variant="destructive" pulse>Disconnected</Badge>
+        <Badge variant="success" size="sm" pulse>Live</Badge>
       </div>
     )},
   ],
