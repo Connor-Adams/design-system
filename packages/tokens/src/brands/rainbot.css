@@ -4,8 +4,18 @@
  * A worked example of the brand axis. See the Customization section of the
  * README for the full set of tokens a brand may override.
  *
- * SCOPE: `:root[data-brand="rainbot"]`. Set it alongside a theme on <html>:
+ * SCOPE: `:root[data-brand="rainbot"][data-theme="dark"]`. Both attributes:
  *   <html data-brand="rainbot" data-theme="dark">
+ *
+ * The theme is part of the selector ON PURPOSE, not a convention. Scoped to
+ * `[data-brand]` alone, forgetting `data-theme="dark"` left the brand's dark
+ * values sitting on Cashflow's LIGHT surfaces, and the result was not merely
+ * ugly -- it was two hard a11y failures: --foreground #18181B on --accent
+ * #3a1024 is 1.08:1, so outline/ghost Button labels (and TrackInfo, QueueList
+ * and PlaybackControls hovers, which share that fill) were invisible; and
+ * --text-link #60a5fa on white is 2.54:1, failing AA and even large-text.
+ * Requiring both attributes makes the failure mode "brand does not apply,
+ * clean Cashflow light" instead of "silently unreadable".
  *
  * A brand is a DELTA, not a fork. Everything not named here falls through to
  * the active theme block in semantic.css, which is the point — this file is
@@ -14,14 +24,15 @@
  * and expects `data-theme="dark"` to be set; pairing it with the light theme
  * will give light surfaces under a blue brand, which is nobody's intent.
  *
- * IMPORT ORDER IS LOAD-BEARING. This selector has the same specificity as
- * `:root[data-theme="dark"]`, so it wins on source order alone. Import it
- * AFTER the base stylesheet, never before:
+ * Because the selector carries two attributes it is specificity 0,3,0 and beats
+ * `:root[data-theme="dark"]` (0,2,0) outright, so it no longer depends on source
+ * order. Import it after the base stylesheet anyway -- a brand that later drops
+ * to a single attribute would silently need the ordering back:
  *   @import "@connor-adams/tokens/styles.css";
  *   @import "@connor-adams/tokens/brands/rainbot.css";
  * ──────────────────────────────────────────────────────────────────────── */
 
-:root[data-brand="rainbot"] {
+:root[data-brand="rainbot"][data-theme="dark"] {
   /* Primitives. Prefixed `--rb-` so they cannot collide with the shared ramps
    * in colors.css. Only the triad is needed — Rainbot's greys are close enough
    * to the Cashflow dark surfaces that overriding them would be noise. */
@@ -54,6 +65,13 @@
    * (foreground + underline on hover); Rainbot is a dashboard, not prose. */
   --text-link: var(--rb-blue-400);
   --text-link-hover: var(--rb-blue-300);
+
+  /* --info must move off the brand hue. Cashflow points it at --chart-steel
+   * (#5EA8E0), which read as "steel blue, not oxblood" there but reads as "the
+   * brand colour" here -- an info Toast (Toast.css border-left-color) would be
+   * chromatically indistinguishable from a primary element. Violet keeps it
+   * inside the brand family while staying clearly not --primary. */
+  --info: var(--rb-violet-400);
 
   /* Brand moment: the blue → violet → pink sweep, replacing Cashflow's
    * orange → magenta. Both stops move with the gradient because chart and bar

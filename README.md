@@ -106,7 +106,7 @@ Cashflow consumer never ships another brand's bytes.
 | Brand | Scope | Import |
 | --- | --- | --- |
 | Cashflow | `:root` (default) | included in `@connor-adams/tokens/styles.css` |
-| Rainbot | `:root[data-brand="rainbot"]` | `@connor-adams/tokens/brands/rainbot.css` |
+| Rainbot | `:root[data-brand="rainbot"][data-theme="dark"]` | `@connor-adams/tokens/brands/rainbot.css` |
 
 ```css
 @import "@connor-adams/tokens/styles.css";
@@ -117,10 +117,21 @@ Cashflow consumer never ships another brand's bytes.
 <html data-brand="rainbot" data-theme="dark">
 ```
 
-**Import order is load-bearing.** A brand selector (`:root[data-brand="x"]`) has
-the same specificity as a theme selector (`:root[data-theme="dark"]`), so it wins
-on source order alone. Importing a brand *before* the base stylesheet silently
-does nothing.
+**Scope a single-theme brand to the theme too.** A brand written against dark
+surfaces must select `:root[data-brand="x"][data-theme="dark"]`, not
+`:root[data-brand="x"]`. Scoped to the brand alone, a consumer who forgets the
+theme attribute gets the brand's dark values on the *light* surfaces underneath,
+and that is not merely ugly — measured on `brands/rainbot.css` before this was
+fixed, `--foreground` on `--accent` came out at **1.08:1** (invisible button
+labels across five components) and `--text-link` on white at **2.54:1** (fails AA
+and large-text), with `color-scheme: dark` leaking onto a light page. Putting the
+theme in the selector makes the failure mode "the brand does not apply" instead
+of "the app is silently unreadable".
+
+It also fixes the specificity: two attributes is 0,3,0, which beats
+`:root[data-theme="dark"]` (0,2,0) outright. A brand scoped to one attribute ties
+at 0,2,0 and wins only on **source order**, so it must be imported *after* the
+base stylesheet or it silently does nothing. Import after it regardless.
 
 Note that token files are deliberately **unlayered** (only the element resets in
 `base.css` sit in `@layer base`, and component CSS in `@layer components`). Do not
@@ -135,8 +146,21 @@ brand overriding five tokens is a five-declaration file — see
 `brands/rainbot.css`, which is ~20 declarations for a completely different look.
 There is no requirement to restate the token layer.
 
-The one thing to be deliberate about: a brand written against dark surfaces
-expects `data-theme="dark"` to be set too. Pair the attributes.
+Two things to be deliberate about. Put the theme in the selector, per above. And
+check the tokens you *don't* name for hue collisions — a fallthrough value that
+was neutral against the old brand may read as the new brand's own colour.
+`--info` is the worked example: Cashflow points it at a steel blue that read as
+"not oxblood" there, but under a blue brand it reads as *the brand*, so an info
+Toast stops being distinguishable from a primary element. `brands/rainbot.css`
+overrides it for that reason.
+
+Be aware too that ~40 of the 55 semantic tokens falling through means the *chrome*
+stays Cashflow's. That is coherent — Cashflow's dark neutrals carry no competing
+hue — and a screen with a gradient, a chart, a CTA or inline links reads
+unmistakably as a different product. But a screen that is mostly cards, tables
+and borders reads as Cashflow with a different primary. If "different product at
+a glance on any screen" is the goal, the surfaces and `--border` have to move too;
+even slightly cooler near-blacks are enough.
 
 ### What you can override
 
@@ -179,9 +203,15 @@ The radius ladder stops at `--radius-xl` (12px), so a 16px card corner has no
 token — `Card`'s `radius` prop tops out there too.
 
 `--shadow` lives in `spacing.css`, not `semantic.css`, and has its own
-`[data-theme="dark"]` override. A brand that does not name it inherits the
-active theme's elevation, so a dark-only brand paired with the light theme is
-noticeably under-elevated across the 17 component CSS files that read it.
+`[data-theme="dark"]` override, so it is easy to miss when enumerating what a
+brand can re-point.
+
+`--accent` does two incompatible jobs. `Button`, `TrackInfo`, `QueueList` and
+`PlaybackControls` use it as a subtle hover *fill*, which wants low saturation;
+`NowPlayingArtwork` uses it as an SVG gradient *stop* paired with `--primary`,
+which wants high saturation. One token cannot serve both — the hover consumers
+win on count, so the artwork placeholder gradient is duller than intended. The
+fix is a separate token for the gradient stop.
 
 ---
 
