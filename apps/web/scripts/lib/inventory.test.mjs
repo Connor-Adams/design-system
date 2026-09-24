@@ -24,8 +24,16 @@ const FIXTURE = {
       { name: 'size', type: 'string', required: false, defaultValue: null, description: '' },
     ],
     // Badge intentionally has no props entry
+    // More than six props on purpose: llms.txt must list every one of them.
     MoneyInput: [
       { name: 'value', type: 'number', required: true, defaultValue: null, description: '' },
+      { name: 'onValueChange', type: '(v: number) => void', required: false, defaultValue: null, description: '' },
+      { name: 'currency', type: 'string', required: false, defaultValue: 'CAD', description: '' },
+      { name: 'locale', type: 'string', required: false, defaultValue: null, description: '' },
+      { name: 'direction', type: "'in' | 'out'", required: false, defaultValue: null, description: '' },
+      { name: 'onDirectionChange', type: '(d: string) => void', required: false, defaultValue: null, description: '' },
+      { name: 'size', type: "'sm' | 'default'", required: false, defaultValue: 'default', description: '' },
+      { name: 'invalid', type: 'boolean', required: false, defaultValue: 'false', description: '' },
     ],
   },
   usage: {
@@ -78,4 +86,12 @@ test('buildInventory llmsTxt: header counts, category sections, bullet + props f
   assert.match(llmsTxt, /- \[Button\]\(\/components\/button\): Clickable action trigger\. Props: variant, size\./)
   // Badge: no props → no trailing "Props:" segment
   assert.match(llmsTxt, /- \[Badge\]\(\/components\/badge\): Badge component\.\n/)
+})
+
+test('buildInventory llmsTxt: lists every prop, no truncation', () => {
+  const { llmsTxt } = buildInventory({ ...FIXTURE, base: '' })
+  const line = llmsTxt.split('\n').find((l) => l.startsWith('- [MoneyInput]'))
+  assert.ok(line, 'MoneyInput bullet present')
+  const listed = line.split('Props: ')[1].replace(/\.$/, '').split(', ')
+  assert.deepEqual(listed, FIXTURE.props.MoneyInput.map((p) => p.name))
 })

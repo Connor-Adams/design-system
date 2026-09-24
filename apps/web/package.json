@@ -8,6 +8,7 @@
     "build": "node scripts/gen-data.mjs && next build",
     "start": "next start -p 3001",
     "typecheck": "tsc --noEmit",
+    "test": "node --test scripts/lib/*.test.mjs",
     "gen": "node scripts/gen-data.mjs"
   },
   "dependencies": {

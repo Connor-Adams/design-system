@@ -16,7 +16,7 @@ Full inventory with prop schemas: /components.json
 - [Progress](/components/progress): A determinate bar for budgets, savings goals, and import progress. Use `tone` to signal state (e.g. `danger` when a category is over budget). Props: value, tone, size, indeterminate, label, showValue.
 - [Separator](/components/separator): A hairline rule to separate sections, list rows, or inline metadata. Props: orientation, label.
 - [Spinner](/components/spinner): An indeterminate loading ring for buttons, inline fetches, and empty panels. Inside a Button it inherits the label color via `tone="current"`. Props: size, tone, label.
-- [Text](/components/text): The single typography primitive — use it for every piece of text instead of bare tags so the type scale and token colors stay consistent. `variant` sets the scale step and a default tag; `as` overrides the tag. Props: variant, as, tone, weight, mono, align.
+- [Text](/components/text): The single typography primitive — use it for every piece of text instead of bare tags so the type scale and token colors stay consistent. `variant` sets the scale step and a default tag; `as` overrides the tag. Props: variant, as, tone, weight, mono, align, truncate.
 
 ## Data
 - [LetterAvatar](/components/letter-avatar): LetterAvatar component. Props: text, size.
@@ -30,25 +30,25 @@ Full inventory with prop schemas: /components.json
 - [Skeleton](/components/skeleton): Skeleton component. Props: w, h.
 
 ## Finance
-- [AccountCard](/components/account-card): A tile for a connected account in lists and the accounts grid. Props: name, institution, mask, balance, currency, locale.
-- [AmountText](/components/amount-text): The money-value primitive — use it for every currency figure instead of hand-coloring spans, so the green-in / oxblood-out convention stays consistent. Props: value, currency, locale, direction, colored, showSign.
+- [AccountCard](/components/account-card): A tile for a connected account in lists and the accounts grid. Props: name, institution, mask, balance, currency, locale, kind, status, selected, onClick.
+- [AmountText](/components/amount-text): The money-value primitive — use it for every currency figure instead of hand-coloring spans, so the green-in / oxblood-out convention stays consistent. Props: value, currency, locale, direction, colored, showSign, decimals, size, weight.
 - [BudgetMeter](/components/budget-meter): A budget-vs-spend row for the budgets screen and category drill-downs. The bar self-colors: green under budget, amber near the limit, oxblood over. Props: label, spent, limit, currency, locale, warnAt.
-- [CategoryBreakdown](/components/category-breakdown): A card that ranks money by category as horizontal bars — the "net spend by category" tile. Props: rows, title, subtitle, trend, trendTone, max.
-- [CategoryPill](/components/category-pill): The category chip for transaction rows, filters, and budgets — icon + label with a per-category tint, drawn from a built-in icon set. Props: category, label, icon, iconName, overrides, color.
+- [CategoryBreakdown](/components/category-breakdown): A card that ranks money by category as horizontal bars — the "net spend by category" tile. Props: rows, title, subtitle, trend, trendTone, max, currency, locale, iconOverrides, onSelect.
+- [CategoryPill](/components/category-pill): The category chip for transaction rows, filters, and budgets — icon + label with a per-category tint, drawn from a built-in icon set. Props: category, label, icon, iconName, overrides, color, interactive, size.
 - [ImportDropzone](/components/import-dropzone): The statement-import target for the import flow — drag-and-drop or click-to-browse a CSV/OFX file. Props: accept, onFile, hint.
-- [MoneyInput](/components/money-input): A currency amount field for adding/editing transactions and setting budgets. Pass `direction` + `onDirectionChange` to show the in/out toggle. Props: value, defaultValue, onValueChange, currency, locale, direction.
+- [MoneyInput](/components/money-input): A currency amount field for adding/editing transactions and setting budgets. Pass `direction` + `onDirectionChange` to show the in/out toggle. Props: value, defaultValue, onValueChange, currency, locale, direction, onDirectionChange, disabled, invalid, size, placeholder.
 - [PeriodSelector](/components/period-selector): The date-range control every ledger view needs — preset periods with an optional custom range, in a compact popover. Props: value, onValueChange, custom, onCustomChange, presets, size.
-- [Sparkline](/components/sparkline): A tiny trend line to sit beside a balance or inside a StatCard — green when the series rises, oxblood when it falls. Props: data, width, height, tone, area, dot.
+- [Sparkline](/components/sparkline): A tiny trend line to sit beside a balance or inside a StatCard — green when the series rises, oxblood when it falls. Props: data, width, height, tone, area, dot, strokeWidth.
 
 ## Forms
 - [Checkbox](/components/checkbox): A square checkbox for multi-select and form opt-ins (select transactions, terms). Use `indeterminate` on a header checkbox when some but not all rows are selected. Props: checked, defaultChecked, onCheckedChange, indeterminate.
-- [Combobox](/components/combobox): A searchable single-select for long option lists (assign a category, pick a payee, choose an account). For a handful of fixed options use NativeSelect. Props: options, value, defaultValue, onValueChange, placeholder, emptyText.
+- [Combobox](/components/combobox): A searchable single-select for long option lists (assign a category, pick a payee, choose an account). For a handful of fixed options use NativeSelect. Props: options, value, defaultValue, onValueChange, placeholder, emptyText, size.
 - [Input](/components/input): Input component. Props: invalid.
 - [Label](/components/label): Label component.
 - [NativeSelect](/components/native-select): NativeSelect component. Props: size, options.
-- [RadioGroup](/components/radio-group): A single-choice radio group for mutually-exclusive options (account type, statement period). Exported as `RadioGroup`. Props: options, value, defaultValue, onValueChange, name, orientation.
-- [Slider](/components/slider): A single-value range control for budgets, thresholds, and filters (e.g. "alert when a transaction exceeds $X"). Props: min, max, step, value, defaultValue, onValueChange.
-- [Stepper](/components/stepper): A compact numeric input for small bounded quantities (split count, reminder days, statement months back). Props: value, defaultValue, onValueChange, min, max, step.
+- [RadioGroup](/components/radio-group): A single-choice radio group for mutually-exclusive options (account type, statement period). Exported as `RadioGroup`. Props: options, value, defaultValue, onValueChange, name, orientation, disabled.
+- [Slider](/components/slider): A single-value range control for budgets, thresholds, and filters (e.g. "alert when a transaction exceeds $X"). Props: min, max, step, value, defaultValue, onValueChange, disabled, showValue, format.
+- [Stepper](/components/stepper): A compact numeric input for small bounded quantities (split count, reminder days, statement months back). Props: value, defaultValue, onValueChange, min, max, step, disabled, size, format.
 - [Switch](/components/switch): A pill toggle for on/off settings (notifications, auto-reconcile) — oxblood when on. Use over Checkbox for instant-apply settings, not form submission. Props: checked, defaultChecked, onCheckedChange, size.
 - [Textarea](/components/textarea): Textarea component. Props: invalid.
 - [ToggleGroup](/components/toggle-group): A segmented control for switching between a few mutually-exclusive views (timeframe, chart type, account filter). For navigation between content panels prefer Tabs; use this for filters and settings. Props: items, type, value, defaultValue, onValueChange, size.
@@ -58,7 +58,7 @@ Full inventory with prop schemas: /components.json
 - [Pagination](/components/pagination): Page navigation for long transaction lists and search results. Props: page, pageCount, onPageChange, siblingCount.
 
 ## Overlays
-- [Dialog](/components/dialog): A modal for confirmations and short forms (delete transaction, edit category, add account). Keep the footer to one primary + one secondary Button. Props: open, onClose, title, description, footer, size.
+- [Dialog](/components/dialog): A modal for confirmations and short forms (delete transaction, edit category, add account). Keep the footer to one primary + one secondary Button. Props: open, onClose, title, description, footer, size, className, style.
 - [DropdownMenu](/components/dropdown-menu): A row/overflow action menu (the ⋯ on a transaction, account, or report). Use `danger` for delete and a `separator` to group destructive actions. Props: trigger, items, align, className, style.
 - [Toast](/components/toast): A transient confirmation that floats bottom-right (transaction saved, statement imported, sync failed). Auto-dismiss after a few seconds; keep copy to one line. Props: variant, title, action, onClose, className, style.
 - [Tooltip](/components/tooltip): A small hover/focus hint for icon buttons and truncated values (full merchant name, exact timestamp). Keep content to a few words — never essential-only info. Props: content, side, className, style.
