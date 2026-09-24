@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { markFieldShape } from './fieldProps'
 import './Stepper.css'
 
 /**
@@ -75,3 +76,8 @@ export const Stepper = React.forwardRef<HTMLDivElement, StepperProps>(function S
     </div>
   )
 })
+
+// Group-shaped: the -/+ buttons take focus and the readout does not, so no single
+// child is "the" control. `<label htmlFor>` cannot associate with `role="group"`,
+// so `Field` names this root with `aria-labelledby` instead.
+markFieldShape(Stepper, 'group')

@@ -1,4 +1,4 @@
-<!-- @dsCard group="Components" viewport="700x460" name="Field" subtitle="Label + control + hint/error with the a11y wired for you" -->
+<!-- @dsCard group="Components" viewport="700x540" name="Field" subtitle="Label + control + hint/error with the a11y wired for you" -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -18,7 +18,7 @@
 <body>
 <div id="root"></div>
 <script type="text/babel">
-  const { Field, Input, Textarea, NativeSelect, Switch, MoneyInput, Text } = window.CashflowDesignSystem_2cf89d;
+  const { Field, Input, Textarea, NativeSelect, Switch, MoneyInput, RadioGroup, Text } = window.CashflowDesignSystem_2cf89d;
   const SearchGlyph = (
     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
       <circle cx="11" cy="11" r="7" /><path d="m21 21-4.3-4.3" />
@@ -48,7 +48,10 @@
         <Field label="Auto-reconcile" hint="Match imported rows automatically.">
           <Switch defaultChecked />
         </Field>
-        <div>
+        <Field className="span" label="Statement cycle" hint="Group-shaped controls are named with aria-labelledby, not htmlFor.">
+          <RadioGroup orientation="horizontal" options={['Monthly','Weekly']} defaultValue="Monthly" />
+        </Field>
+        <div className="span">
           <Text variant="body-sm" tone="muted">
             Error beats hint: while <code>error</code> is set the hint is not rendered, so
             <code> aria-describedby</code> never points at stale help text.

@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { fieldShapeOf } from './fieldProps'
 import { Label } from './Label'
 import './Field.css'
 
@@ -32,11 +33,27 @@ export type FieldChildren = React.ReactNode | ((control: FieldControlProps) => R
  * should); a child that cannot take DOM props — or a control nested deeper —
  * should use the render-prop form and place them itself.
  *
- * Caveat: controls whose `...props` land on a wrapper `<div>` rather than on the
- * focusable element — `Combobox` and `Slider` — take the id on that wrapper, so
- * `htmlFor` does not create a native label association. The label still reads as
- * adjacent text and the description is still announced; use the render-prop form
- * and place `id` on the inner control if you need the hard association.
+ * **Group-shaped controls are labelled differently.** `Stepper`, `RadioGroup`
+ * and `ToggleGroup` are containers whose focusable children are nested, so there
+ * is no labelable element for `htmlFor` to reach — `<label for>` pointing at a
+ * `role="group"` container associates with *nothing*, and it fails silently: the
+ * label still renders as adjacent text and `aria-describedby` still announces,
+ * so it looks wired when it is not. For those children the label takes an `id`
+ * and the control takes `aria-labelledby` pointing at it, which is how ARIA
+ * names a group. The shape is declared by the control itself (`markFieldShape`
+ * in `fieldProps.ts`), never guessed here, so a composite added later cannot
+ * quietly inherit the labelable path; `fieldContract.test.tsx` enforces the
+ * declaration.
+ *
+ * `aria-describedby`, `aria-invalid` and `aria-required` stay on the group root
+ * for both shapes — description, validity and requiredness belong to the whole
+ * group. (`radiogroup` supports all three; a bare `role="group"` formally
+ * supports only `aria-describedby` and ignores the other two rather than
+ * misreporting them, so they are left in place rather than stripped per role.)
+ *
+ * The label always carries an `id` of the control id suffixed with `-label`, so
+ * the render-prop form can name a group nested deeper: take `id` from the
+ * argument and set `aria-labelledby` to that id plus `-label`.
  *
  * All visuals live in `Field.css`; the ref forwards to the wrapper `<div>`.
  */
@@ -70,6 +87,7 @@ export const Field = React.forwardRef<HTMLDivElement, FieldProps>(function Field
   // An explicit `id` wins over the generated one; a child that already carries
   // its own id keeps it, so htmlFor still points at the real control.
   const controlId = id ?? childId ?? `ca-field-${autoId}`
+  const labelId = `${controlId}-label`
   const hasError = error != null && error !== false
   const hasHint = !hasError && hint != null && hint !== false
   const messageId = hasError ? `${controlId}-error` : `${controlId}-hint`
@@ -77,6 +95,16 @@ export const Field = React.forwardRef<HTMLDivElement, FieldProps>(function Field
   const describedBy =
     [hasError || hasHint ? messageId : undefined, childDescribedBy].filter(Boolean).join(' ') ||
     undefined
+
+  // A group-shaped child (declared by the control, not sniffed here) has no
+  // labelable element for `htmlFor` to reach, so it is named by pointing
+  // `aria-labelledby` back at the label. A child that already names itself keeps
+  // its own name.
+  const isGroup = element != null && fieldShapeOf(element.type) === 'group'
+  const childNamesItself =
+    typeof childProps['aria-labelledby'] === 'string' ||
+    typeof childProps['aria-label'] === 'string'
+  const labelledBy = isGroup && label != null && !childNamesItself ? labelId : undefined
 
   const wiring: FieldControlProps = {
     id: controlId,
@@ -92,6 +120,7 @@ export const Field = React.forwardRef<HTMLDivElement, FieldProps>(function Field
     : element
       ? React.cloneElement(element, {
           ...wiring,
+          ...(labelledBy ? { 'aria-labelledby': labelledBy } : {}),
           ...childProps,
           ...(describedBy ? { 'aria-describedby': describedBy } : {}),
         })
@@ -106,7 +135,13 @@ export const Field = React.forwardRef<HTMLDivElement, FieldProps>(function Field
       {...props}
     >
       {label != null && (
-        <Label className="ca-field-label" htmlFor={controlId} data-slot="field-label">
+        <Label
+          id={labelId}
+          className="ca-field-label"
+          // A group root is not labelable, so `htmlFor` would resolve to nothing.
+          htmlFor={isGroup ? undefined : controlId}
+          data-slot="field-label"
+        >
           {label}
           {required && (
             <span className="ca-field-required" data-slot="field-required" aria-hidden="true">

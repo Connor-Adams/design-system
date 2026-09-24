@@ -8,6 +8,9 @@ import {
   Switch,
   Slider,
   MoneyInput,
+  Stepper,
+  RadioGroup,
+  ToggleGroup,
 } from '@connor-adams/designsystem'
 
 const meta: Meta<typeof Field> = {
@@ -89,6 +92,35 @@ export const AnyControl: Story = {
       </Field>
       <Field label="Alert threshold" hint="Percent of budget.">
         <Slider min={0} max={100} defaultValue={80} showValue />
+      </Field>
+    </div>
+  ),
+}
+
+/**
+ * Group-shaped controls — several focusable children under one role-bearing root.
+ * `htmlFor` cannot associate with a container, so `Field` names these with
+ * `aria-labelledby` instead. Inspect the accessibility tree: the group's name is
+ * the Field label.
+ */
+export const GroupShapedControls: Story = {
+  render: () => (
+    <div style={{ display: 'grid', gap: 16, maxWidth: 340 }}>
+      <Field label="Months back" hint="How far the report reaches.">
+        <Stepper defaultValue={3} min={1} max={12} format={(v) => `${v} mo`} />
+      </Field>
+      <Field label="Statement cycle" required>
+        <RadioGroup orientation="horizontal" options={['Monthly', 'Weekly']} defaultValue="Monthly" />
+      </Field>
+      <Field label="Range" error="Pick a range.">
+        <ToggleGroup
+          items={[
+            { value: 'week', label: 'Week' },
+            { value: 'month', label: 'Month' },
+            { value: 'year', label: 'Year' },
+          ]}
+          defaultValue="month"
+        />
       </Field>
     </div>
   ),

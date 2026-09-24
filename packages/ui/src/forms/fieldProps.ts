@@ -72,3 +72,46 @@ export function splitControlProps<P extends ControlIdentityProps>(
     wrapper: wrapper as Omit<P, keyof ControlIdentityProps>,
   }
 }
+
+/**
+ * Which element inside a control is "the" control, from `Field`'s point of view.
+ *
+ * - `labelable` — one focusable element *is* the control (`Input`, `Textarea`,
+ *   `NativeSelect`, `Checkbox`, `Switch`, and the composites above once they
+ *   route identity props inward). An `id` on it is meaningful and
+ *   `<label htmlFor>` associates natively.
+ * - `group` — the root is a container whose focusable children are nested
+ *   (`Stepper`, `RadioGroup`, `ToggleGroup`). No single `id` is "the" control,
+ *   and `htmlFor` pointing at a container associates with *nothing*: the label
+ *   still renders as adjacent text, so the failure is silent. Such a root is
+ *   named with `aria-labelledby` pointing back at the label instead.
+ *
+ * `labelable` is the default precisely because it is the harmless answer — a
+ * plain control mislabelled as a group would lose a working association, while
+ * a group left unmarked is only as broken as it was before this existed. The
+ * table in `fieldContract.test.tsx` is what keeps the markers honest.
+ */
+export type FieldShape = 'labelable' | 'group'
+
+/**
+ * Declare a component group-shaped so `Field` names it with `aria-labelledby`.
+ *
+ * Deliberately a mutation called *next to* the component's declaration rather
+ * than a wrapper around `React.forwardRef(...)`: the docs site's prop table
+ * comes from `react-docgen-typescript`, which only recognises a bare
+ * `React.forwardRef` initialiser — wrapping it drops the component's props from
+ * the gallery. This also keeps the published type of the component untouched.
+ */
+export function markFieldShape(component: object, shape: FieldShape): void {
+  ;(component as { fieldShape?: FieldShape }).fieldShape = shape
+}
+
+/**
+ * Read a component's declared shape. Anything unmarked is `labelable`, which is
+ * the behaviour every control had before groups were distinguished.
+ */
+export function fieldShapeOf(type: unknown): FieldShape {
+  return (type as { fieldShape?: FieldShape } | null | undefined)?.fieldShape === 'group'
+    ? 'group'
+    : 'labelable'
+}

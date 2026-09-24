@@ -1174,6 +1174,26 @@ export const previews: Record<string, Variant[]> = {
         </Field>
       </div>
     )},
+    { label: 'Group-shaped controls (named via aria-labelledby)', node: (
+      <div style={{ display: 'grid', gap: 14, maxWidth: 300 }}>
+        <Field label="Months back" hint="How far the report reaches.">
+          <Stepper defaultValue={3} min={1} max={12} format={(v) => `${v} mo`} />
+        </Field>
+        <Field label="Statement cycle" required>
+          <RadioGroup orientation="horizontal" options={['Monthly', 'Weekly']} defaultValue="Monthly" />
+        </Field>
+        <Field label="Range" error="Pick a range.">
+          <ToggleGroup
+            items={[
+              { value: 'week', label: 'Week' },
+              { value: 'month', label: 'Month' },
+              { value: 'year', label: 'Year' },
+            ]}
+            defaultValue="month"
+          />
+        </Field>
+      </div>
+    )},
   ],
 
   input: [
