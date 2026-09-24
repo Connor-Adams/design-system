@@ -887,6 +887,17 @@ export const previews: Record<string, Variant[]> = {
   ],
 
   'stat-grid': [
+    { label: 'Divided · partial last row', node: (
+      <StatGrid columns={3} divided>
+        <StatCard bare label="Net spend" value="$4,210" delta="-8%" metricKind="spend" />
+        <StatCard bare label="Income" value="$9,800" delta="+3%" metricKind="gain" />
+        <StatCard bare label="Net savings" value="$2,180" delta="+12%" metricKind="gain" />
+        <StatCard bare label="Transactions" value="312" delta="+24" metricKind="neutral" />
+        <StatCard bare label="Accounts" value="7" delta="+1" metricKind="neutral" />
+        <StatCard bare label="Categories" value="24" delta="0" metricKind="neutral" />
+        <StatCard bare label="Flagged" value="1" delta="-2" metricKind="neutral" />
+      </StatGrid>
+    )},
     { label: 'Auto-fit', node: (
       <StatGrid>
         <StatCard label="Net spend" value="$4,210" hint="This month" delta="-8%" metricKind="spend" />

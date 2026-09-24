@@ -47,16 +47,26 @@
   background: var(--card);
 }
 
-/* The interior rules: an outset hairline on each cell's left and top edge.
+/* The interior rules: an outset hairline on each cell's RIGHT and BOTTOM edge.
    This needs no :nth-child math, so it survives auto-fit's unknown (and
-   viewport-dependent) column count — the first row's top rules and the first
-   column's left rules fall outside the container's padding box and are clipped
-   by `overflow: hidden`, leaving only the interior ones. It also replaces any
-   elevation a cell drew for itself, which a strip shouldn't have. */
+   viewport-dependent) column count — the last column's right rules and the
+   final row's bottom rules fall outside the container's padding box and are
+   clipped by `overflow: hidden`, leaving only the interior ones. It also
+   replaces any elevation a cell drew for itself, which a strip shouldn't have.
+
+   The right/bottom choice is load-bearing, not arbitrary. Drawing left/top
+   instead looks identical whenever the cell count is a multiple of the column
+   count, but breaks on a partial last row: the rule between the last full row
+   and the partial one would be drawn by the cells BELOW it, so it spanned only
+   the filled columns and terminated in mid-air, leaving the rest of that
+   boundary blank. Drawing bottom edges makes that rule the property of the row
+   ABOVE, which is always full, so it always spans the whole width; and drawing
+   right edges closes off a lone trailing cell, so the empty remainder reads as
+   an empty cell rather than a missing rule. Do not flip these back. */
 .ca-stat-grid[data-divided='true'] > * {
   box-shadow:
-    -1px 0 0 0 var(--border),
-    0 -1px 0 0 var(--border);
+    1px 0 0 0 var(--border),
+    0 1px 0 0 var(--border);
 }
 
 /* Cells bring their own padding — a StatCard already does. But it also draws
