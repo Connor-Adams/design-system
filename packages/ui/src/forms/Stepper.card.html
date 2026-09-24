@@ -1,4 +1,4 @@
-<!-- @dsCard group="Components" viewport="700x180" name="Stepper" subtitle="Compact numeric input with −/+ controls" -->
+<!-- @dsCard group="Components" viewport="700x230" name="Stepper" subtitle="Compact numeric input with −/+ controls" -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -26,10 +26,13 @@
     return (
       <div className="wrap">
         <div className="row">
-          <div className="stack"><Text variant="label" tone="muted">Split count</Text><Stepper defaultValue={2} min={1} max={8} /></div>
-          <div className="stack"><Text variant="label" tone="muted">Months back</Text><Stepper defaultValue={3} min={1} max={12} format={(v) => v + ' mo'} /></div>
-          <div className="stack"><Text variant="label" tone="muted">Disabled</Text><Stepper defaultValue={1} disabled /></div>
+          <div className="stack"><Text id="split-label" variant="label" tone="muted">Split count</Text><Stepper aria-labelledby="split-label" defaultValue={2} min={1} max={8} /></div>
+          <div className="stack"><Text id="months-label" variant="label" tone="muted">Months back</Text><Stepper aria-labelledby="months-label" defaultValue={3} min={1} max={12} format={(v) => v + ' mo'} /></div>
+          <div className="stack"><Text id="disabled-label" variant="label" tone="muted">Disabled</Text><Stepper aria-labelledby="disabled-label" defaultValue={1} disabled /></div>
         </div>
+        <Text variant="body-sm" tone="muted">
+          A labelled group (role="group"): name it with aria-labelledby, not a label htmlFor — the −/+ buttons take focus, the readout does not.
+        </Text>
       </div>
     );
   }
