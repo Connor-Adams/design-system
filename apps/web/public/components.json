@@ -1,6 +1,6 @@
 {
   "package": "@connor-adams/designsystem",
-  "version": "0.3.1",
+  "version": "1.0.0",
   "import": "import { <Name> } from '@connor-adams/designsystem'",
   "categories": [
     "core",
@@ -149,7 +149,7 @@
       "props": [
         {
           "name": "name",
-          "type": "\"type\" | \"map\" | \"filter\" | \"key\" | \"search\" | \"send\" | \"grid\" | \"link\" | \"list\" | \"menu\" | \"navigation\" | \"timer\" | \"copy\" | \"wallet\" | \"credit-card\" | \"dollar-sign\" | \"piggy-bank\" | ... 154 more ... | \"chevron-right\"",
+          "type": "IconName",
           "required": true,
           "defaultValue": null,
           "description": "Which glyph to render."
@@ -167,6 +167,13 @@
           "required": false,
           "defaultValue": "2",
           "description": "Stroke weight. Default 2."
+        },
+        {
+          "name": "brand",
+          "type": "boolean | undefined",
+          "required": false,
+          "defaultValue": "false",
+          "description": "Render a `brand:` glyph in its official color instead of `currentColor`. No-op on stroke glyphs."
         },
         {
           "name": "title",
@@ -717,7 +724,7 @@
         },
         {
           "name": "weight",
-          "type": "\"bold\" | \"regular\" | \"medium\" | \"semibold\" | undefined",
+          "type": "\"bold\" | \"medium\" | \"regular\" | \"semibold\" | undefined",
           "required": false,
           "defaultValue": "bold",
           "description": ""
@@ -839,6 +846,13 @@
           "description": ""
         },
         {
+          "name": "iconOverrides",
+          "type": "CategoryOverrides | undefined",
+          "required": false,
+          "defaultValue": null,
+          "description": "App-supplied category→icon map applied to every row's pill."
+        },
+        {
           "name": "onSelect",
           "type": "((category: string, row: CategoryBreakdownRow) => void) | undefined",
           "required": false,
@@ -873,7 +887,21 @@
           "type": "ReactNode",
           "required": false,
           "defaultValue": null,
-          "description": ""
+          "description": "Raw SVG geometry to render instead of any inferred/registry glyph."
+        },
+        {
+          "name": "iconName",
+          "type": "IconName | undefined",
+          "required": false,
+          "defaultValue": null,
+          "description": "A glyph from the icon registry by name — e.g. an app's stored category icon."
+        },
+        {
+          "name": "overrides",
+          "type": "CategoryOverrides | undefined",
+          "required": false,
+          "defaultValue": null,
+          "description": "App-supplied category→icon map; wins over keyword inference."
         },
         {
           "name": "color",
