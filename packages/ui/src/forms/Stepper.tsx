@@ -8,6 +8,13 @@ import './Stepper.css'
  *
  * Interactive states (button hover, focus-visible ring, disabled) live in
  * `Stepper.css`, keyed off `data-size`. The ref forwards to the root container.
+ *
+ * Stepper is inherently multi-element — the −/+ buttons take focus, the readout
+ * does not, and no single child is "the" control — so it exposes a labelled
+ * *group* rather than pretending to be one labelable element: the root carries
+ * `role="group"`, and `id` / `aria-*` stay on it. Name it with
+ * `aria-label` / `aria-labelledby` (pointing at your label's id), not with a
+ * `<label htmlFor>`, which cannot associate with a group.
  */
 export interface StepperProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'defaultValue' | 'onChange'> {
   value?: number
@@ -39,6 +46,7 @@ export const Stepper = React.forwardRef<HTMLDivElement, StepperProps>(function S
   return (
     <div
       ref={ref}
+      role="group"
       data-slot="stepper"
       data-size={size}
       data-disabled={disabled || undefined}

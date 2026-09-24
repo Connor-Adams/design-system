@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react'
-import { Combobox } from '@connor-adams/designsystem'
+import { Combobox, Label } from '@connor-adams/designsystem'
 
 const ACCOUNT_OPTIONS = [
   { value: 'checking', label: 'Checking', hint: '••4521' },
@@ -29,3 +29,20 @@ type Story = StoryObj<typeof Combobox>
 export const Default: Story = {}
 export const WithDefaultValue: Story = { args: { defaultValue: 'savings' } }
 export const Small: Story = { args: { size: 'sm' } }
+
+/**
+ * `id` and the labelling `aria-*` attributes are routed to the inner search
+ * `<input>`, so `<label htmlFor>` really associates — click the label and the
+ * search field takes focus.
+ */
+export const WithAssociatedLabel: Story = {
+  render: (args) => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+      <Label htmlFor="account">Account</Label>
+      <Combobox {...args} id="account" name="account" aria-describedby="account-hint" />
+      <span id="account-hint" style={{ fontSize: 'var(--text-body-sm)', color: 'var(--muted-foreground)' }}>
+        Type to filter; the hint is announced with the field.
+      </span>
+    </div>
+  ),
+}
