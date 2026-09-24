@@ -194,6 +194,43 @@ export const previews: Record<string, Variant[]> = {
         <Icon name="brand:starbucks" size={34} brand />
       </div>
     )},
+    { label: 'Media & audio', node: (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 14, color: 'var(--foreground)' }}>
+        <div style={{ display: 'flex', gap: 16, alignItems: 'center', flexWrap: 'wrap' }}>
+          <Icon name="skip-back" size={24} />
+          <Icon name="rewind" size={24} />
+          <Icon name="play" size={24} />
+          <Icon name="pause" size={24} />
+          <Icon name="stop" size={24} />
+          <Icon name="fast-forward" size={24} />
+          <Icon name="skip-forward" size={24} />
+          <Icon name="play-circle" size={24} />
+          <Icon name="pause-circle" size={24} />
+          <Icon name="shuffle" size={24} />
+          <Icon name="repeat-1" size={24} />
+        </div>
+        <div style={{ display: 'flex', gap: 16, alignItems: 'center', flexWrap: 'wrap' }}>
+          <Icon name="volume-x" size={24} />
+          <Icon name="volume-1" size={24} />
+          <Icon name="volume" size={24} />
+          <Icon name="mic" size={24} />
+          <Icon name="mic-off" size={24} />
+          <Icon name="headphones" size={24} />
+          <Icon name="speaker" size={24} />
+          <Icon name="cast" size={24} />
+          <Icon name="airplay" size={24} />
+        </div>
+        <div style={{ display: 'flex', gap: 16, alignItems: 'center', flexWrap: 'wrap' }}>
+          <Icon name="music" size={24} />
+          <Icon name="disc" size={24} />
+          <Icon name="album" size={24} />
+          <Icon name="radio" size={24} />
+          <Icon name="podcast" size={24} />
+          <Icon name="list-music" size={24} />
+          <Icon name="audio-lines" size={24} />
+        </div>
+      </div>
+    )},
     { label: 'Registry', node: (
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(8, 1fr)', gap: 16, color: 'var(--foreground)' }}>
         {iconNames.map((name) => <Icon key={name} name={name} size={22} />)}

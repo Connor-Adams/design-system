@@ -1,6 +1,6 @@
 import { createRef } from 'react'
 import { render, screen } from '@testing-library/react'
-import { Icon, iconNames } from './Icon'
+import { GLYPHS, Icon, iconNames } from './Icon'
 import { brandColors } from './brandGlyphs'
 
 describe('Icon', () => {
@@ -84,5 +84,75 @@ describe('Icon', () => {
 
   it('includes brand names in iconNames', () => {
     expect(iconNames).toContain('brand:spotify')
+  })
+})
+
+const MEDIA_GLYPHS = [
+  'stop',
+  'fast-forward',
+  'rewind',
+  'play-circle',
+  'pause-circle',
+  'shuffle',
+  'repeat-1',
+  'volume-1',
+  'headphones',
+  'speaker',
+  'mic-off',
+  'cast',
+  'airplay',
+  'disc',
+  'album',
+  'radio',
+  'podcast',
+  'list-music',
+  'audio-lines',
+] as const
+
+describe('Icon media glyphs', () => {
+  it.each(MEDIA_GLYPHS)('registers %s in GLYPHS and iconNames', (name) => {
+    expect(GLYPHS).toHaveProperty(name)
+    expect(iconNames).toContain(name)
+  })
+
+  it.each(MEDIA_GLYPHS)('renders %s with drawable geometry', (name) => {
+    const { container } = render(<Icon name={name} />)
+    const svg = container.querySelector('svg')!
+    expect(svg).toHaveAttribute('data-icon', name)
+    expect(svg.querySelectorAll('path, circle, rect, line, polygon, polyline').length).toBeGreaterThan(0)
+  })
+
+  it.each(MEDIA_GLYPHS)('keeps %s a pure stroke glyph with no baked-in color', (name) => {
+    const { container } = render(<Icon name={name} />)
+    const svg = container.querySelector('svg')!
+    expect(svg).toHaveAttribute('fill', 'none')
+    expect(svg).toHaveAttribute('stroke', 'currentColor')
+    for (const child of Array.from(svg.children)) {
+      expect(child.hasAttribute('fill')).toBe(false)
+      expect(child.hasAttribute('stroke')).toBe(false)
+      expect(child.hasAttribute('style')).toBe(false)
+    }
+  })
+
+  it('does not repurpose the existing subscriptions `repeat` glyph', () => {
+    expect(iconNames).toContain('repeat')
+    expect(GLYPHS.repeat).not.toEqual(GLYPHS['repeat-1'])
+  })
+
+  it('wraps play-circle / pause-circle in the same r=10 circle as the other *-circle glyphs', () => {
+    const radius = (name: Parameters<typeof Icon>[0]['name']) => {
+      const { container } = render(<Icon name={name} />)
+      return container.querySelector('svg > circle')!.getAttribute('r')
+    }
+    expect(radius('play-circle')).toBe(radius('check-circle'))
+    expect(radius('pause-circle')).toBe(radius('x-circle'))
+    expect(radius('play-circle')).toBe(radius('plus-circle'))
+    expect(radius('play-circle')).toBe('10')
+  })
+
+  it('covers the full audio surface the media components need', () => {
+    for (const name of ['play', 'pause', 'stop', 'skip-forward', 'skip-back', 'volume', 'volume-x', 'music', 'mic']) {
+      expect(iconNames).toContain(name)
+    }
   })
 })
