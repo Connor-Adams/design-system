@@ -1,4 +1,4 @@
-<!-- @dsCard group="Components" viewport="700x360" name="Data — StatCard, Table, Tabs, Avatar" subtitle="Money-aware KPIs and the data table" -->
+<!-- @dsCard group="Components" viewport="700x430" name="Data — StatCard, Table, Tabs, Avatar" subtitle="Money-aware KPIs, the data table, and the scrolling tablist" -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -21,6 +21,9 @@
   const { StatCard, Table, TableHeader, TableBody, TableRow, TableHead, TableCell, Tabs, LetterAvatar, Badge } = window.CashflowDesignSystem_2cf89d;
   function Demo() {
     const [tab, setTab] = React.useState('all');
+    const [stat, setStat] = React.useState('summary');
+    const statTabs = ['Summary','Commands','Sounds','Users','Guilds','Queue','Time Trends','History','Sessions','Performance']
+      .map((label) => ({ value: label.toLowerCase().replace(/ /g,'-'), label }));
     const rows = [
       ['Whole Foods Market','Amex Cobalt','Groceries','-$84.20','negative'],
       ['Payroll · Acme Inc','TD Chequing','Income','+$4,900.00','positive'],
@@ -34,6 +37,10 @@
           <StatCard label="Transactions" value="312" hint="In current filters" delta="+24" metricKind="neutral" />
         </div>
         <Tabs items={[{value:'all',label:'All'},{value:'biz',label:'Business'},{value:'personal',label:'Personal'}]} value={tab} onValueChange={setTab} />
+        {/* overflow="scroll": one row, faded edges, arrow keys drag the scroll along */}
+        <div style={{ maxWidth: 360 }}>
+          <Tabs items={statTabs} value={stat} onValueChange={setStat} overflow="scroll" />
+        </div>
         <Table>
           <TableHeader>
             <TableRow>

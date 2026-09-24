@@ -76,6 +76,66 @@ function TabsPreview(): React.JSX.Element {
   )
 }
 
+const MANY_TAB_ITEMS = [
+  'Summary',
+  'Commands',
+  'Sounds',
+  'Users',
+  'Guilds',
+  'Queue',
+  'Time Trends',
+  'History',
+  'Sessions',
+  'Performance',
+  'Errors',
+  'Retention',
+].map((label) => ({ value: label.toLowerCase().replace(/ /g, '-'), label }))
+
+/** Default overflow: a long bar wraps onto several rows. */
+function TabsWrapPreview(): React.JSX.Element {
+  const [value, setValue] = React.useState('summary')
+  return (
+    <div style={{ maxWidth: 360 }}>
+      <Tabs items={MANY_TAB_ITEMS} value={value} onValueChange={setValue} />
+    </div>
+  )
+}
+
+/** overflow="scroll": one row, faded edges, selection scrolled into view. */
+function TabsScrollPreview(): React.JSX.Element {
+  const [value, setValue] = React.useState('summary')
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 10, maxWidth: 360 }}>
+      <Tabs items={MANY_TAB_ITEMS} value={value} onValueChange={setValue} overflow="scroll" />
+      <button
+        type="button"
+        onClick={() => setValue(value === 'retention' ? 'summary' : 'retention')}
+        style={{ alignSelf: 'flex-start', font: 'inherit', cursor: 'pointer' }}
+      >
+        Jump to {value === 'retention' ? 'first' : 'last'} tab
+      </button>
+    </div>
+  )
+}
+
+/** Panels belong to the consumer — panelId/tabId wire the ARIA relationship. */
+function TabsWithPanelPreview(): React.JSX.Element {
+  const [value, setValue] = React.useState('all')
+  const items = [
+    { value: 'all', label: 'All', tabId: 'ca-preview-tab-all', panelId: 'ca-preview-panel-all' },
+    { value: 'biz', label: 'Business', tabId: 'ca-preview-tab-biz', panelId: 'ca-preview-panel-biz' },
+  ]
+  const active = items.find((item) => item.value === value)
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+      <Tabs items={items} value={value} onValueChange={setValue} />
+      <div id={active?.panelId} role="tabpanel" aria-labelledby={active?.tabId} tabIndex={0}>
+        Showing <strong>{value}</strong> transactions.
+      </div>
+    </div>
+  )
+}
+
 function PeriodSelectorPreview(): React.JSX.Element {
   const [value, setValue] = React.useState('this-month')
   return <PeriodSelector value={value} onValueChange={setValue} />
@@ -331,7 +391,12 @@ export const previews: Record<string, Variant[]> = {
     )},
   ],
 
-  tabs: [{ label: 'Interactive', node: <TabsPreview /> }],
+  tabs: [
+    { label: 'Interactive', node: <TabsPreview /> },
+    { label: 'Overflow — wrap (default)', node: <TabsWrapPreview /> },
+    { label: 'Overflow — scroll', node: <TabsScrollPreview /> },
+    { label: 'Wired to a panel', node: <TabsWithPanelPreview /> },
+  ],
 
   // --- feedback -------------------------------------------------------------
   alert: [
