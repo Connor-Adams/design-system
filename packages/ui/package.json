@@ -1,6 +1,6 @@
 {
   "name": "@connor-adams/designsystem",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "description": "Connor Adams design system — React components built on @connor-adams/tokens.",
   "license": "SEE LICENSE FILE",
   "type": "module",
