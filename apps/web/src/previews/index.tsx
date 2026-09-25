@@ -1152,6 +1152,34 @@ export const previews: Record<string, Variant[]> = {
         defaultValue="savings"
       />
     )},
+    // Focus it and arrow around: the highlight moves, onValueChange stays quiet
+    // until Enter. Options are non-focusable, so Tab reaches the sibling button.
+    { label: 'Keyboard (↓↑ move, Enter commits, Esc closes)', node: (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 8, width: 260 }}>
+        <Combobox
+          aria-label="Category"
+          options={[
+            { value: 'groceries', label: 'Groceries' },
+            { value: 'dining', label: 'Dining' },
+            { value: 'transport', label: 'Transport' },
+            { value: 'subscriptions', label: 'Subscriptions' },
+            { value: 'utilities', label: 'Utilities' },
+            { value: 'income', label: 'Income' },
+            { value: 'fees', label: 'Fees' },
+            { value: 'transfers', label: 'Transfers' },
+          ]}
+          placeholder="Assign category…"
+        />
+        <Button variant="outline" size="sm">Tab reaches me</Button>
+      </div>
+    )},
+    { label: 'Disabled', node: (
+      <Combobox
+        disabled
+        options={[{ value: 'savings', label: 'Savings', hint: '••8830' }]}
+        defaultValue="savings"
+      />
+    )},
   ],
 
   field: [

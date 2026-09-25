@@ -1,13 +1,22 @@
 /* Combobox — searchable single-select. Interactive states (focus ring on the
-   control, option hover/active highlight) live in CSS, keyed off data-state /
-   data-active — no JS onMouseEnter. All colors reach through the semantic token
-   layer; no raw hex. */
+   control, option hover, the selected fill, the keyboard highlight and disabled)
+   live in CSS, keyed off data-state / data-active / data-highlighted /
+   data-disabled — no JS onMouseEnter. All colors reach through the semantic
+   token layer; no raw hex. */
 
 .ca-combobox {
   position: relative;
   display: inline-block;
   min-width: 220px;
   font-family: var(--font-sans);
+}
+/* Disabled — mirrors Slider / Stepper's data-disabled on the wrapper. */
+.ca-combobox[data-disabled] {
+  opacity: 0.6;
+}
+.ca-combobox[data-disabled] .ca-combobox-control {
+  cursor: not-allowed;
+  background: var(--muted);
 }
 
 .ca-combobox-control {
@@ -48,10 +57,20 @@
 .ca-combobox[data-size='sm'] .ca-combobox-input {
   font-size: var(--text-body-sm);
 }
+.ca-combobox-input:disabled {
+  cursor: not-allowed;
+  color: var(--muted-foreground);
+}
 /* Keyboard focus ring on the control wrapper when the inner input is focused. */
 .ca-combobox-input:focus-visible {
   outline: 2px solid var(--ring);
   outline-offset: 4px;
+}
+
+/* The panel stays in the DOM while closed so `aria-controls` always resolves;
+   `hidden` keeps it out of the accessibility tree, and out of the layout. */
+.ca-combobox-list[hidden] {
+  display: none;
 }
 
 .ca-combobox-list {
@@ -90,6 +109,7 @@
   font-family: var(--font-sans);
   background: transparent;
   color: var(--foreground);
+  user-select: none;
 }
 .ca-combobox-option:hover:not([data-active='true']) {
   background: var(--muted);
@@ -98,7 +118,13 @@
   background: var(--accent);
   color: var(--accent-foreground);
 }
-.ca-combobox-option:focus-visible {
+/* The keyboard-active row — what aria-activedescendant names. Focus itself never
+   leaves the input (which carries the :focus-visible ring), so the highlight has
+   to draw the "you are here" affordance for the list. */
+.ca-combobox-option[data-highlighted='true']:not([data-active='true']) {
+  background: var(--muted);
+}
+.ca-combobox-option[data-highlighted='true'] {
   outline: 2px solid var(--ring);
   outline-offset: -2px;
 }
