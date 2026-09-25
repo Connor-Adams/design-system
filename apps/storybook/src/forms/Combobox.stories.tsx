@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react'
+import * as React from 'react'
 import { Combobox, Label } from '@connor-adams/designsystem'
 
 const ACCOUNT_OPTIONS = [
@@ -29,6 +30,45 @@ type Story = StoryObj<typeof Combobox>
 export const Default: Story = {}
 export const WithDefaultValue: Story = { args: { defaultValue: 'savings' } }
 export const Small: Story = { args: { size: 'sm' } }
+
+/**
+ * `disabled` reaches the inner search `<input>`, so the control really leaves the
+ * tab order, and the wrapper reflects `data-disabled` for styling. The list can
+ * no longer be opened by focus, click or keyboard.
+ */
+export const Disabled: Story = { args: { disabled: true, defaultValue: 'savings' } }
+
+/**
+ * Fully keyboard-operable, ARIA combobox pattern. Tab to the field, then:
+ * ArrowDown / ArrowUp open the list and move the active row (wrapping at both
+ * ends, seeded on the committed value), Home / End jump to the first / last row,
+ * Enter commits the active row, Escape closes and discards the typed filter,
+ * Alt+ArrowDown opens without moving and Alt+ArrowUp closes. Tab closes the list
+ * and moves on — the options are non-focusable, so focus is never trapped.
+ *
+ * **Selection does not follow focus:** arrowing moves `aria-activedescendant`
+ * only; `onValueChange` fires on Enter or a click. Watch the log below.
+ */
+export const Keyboard: Story = {
+  render: (args) => {
+    const [log, setLog] = React.useState<string[]>([])
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 8, width: 280 }}>
+        <Label htmlFor="kb-account">Account</Label>
+        <Combobox
+          {...args}
+          id="kb-account"
+          name="account"
+          onValueChange={(v) => setLog((l) => [...l, v].slice(-4))}
+        />
+        <span style={{ fontSize: 'var(--text-body-sm)', color: 'var(--muted-foreground)' }}>
+          onValueChange: {log.length ? log.join(' → ') : '(nothing yet — arrow around, it stays quiet)'}
+        </span>
+        <button type="button">A focusable sibling, to prove Tab escapes</button>
+      </div>
+    )
+  },
+}
 
 /**
  * `id` and the labelling `aria-*` attributes are routed to the inner search

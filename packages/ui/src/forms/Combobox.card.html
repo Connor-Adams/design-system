@@ -1,4 +1,4 @@
-<!-- @dsCard group="Components" viewport="700x340" name="Combobox" subtitle="Searchable single-select with filtering" -->
+<!-- @dsCard group="Components" viewport="700x420" name="Combobox" subtitle="Searchable single-select, fully keyboard-operable" -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -20,7 +20,7 @@
 <body>
 <div id="root"></div>
 <script type="text/babel">
-  const { Combobox, Label, Text } = window.CashflowDesignSystem_2cf89d;
+  const { Combobox, Kbd, Label, Text } = window.CashflowDesignSystem_2cf89d;
   function Demo() {
     
     return (
@@ -35,10 +35,16 @@
             { value: 'income', label: 'Income' },
             { value: 'fees', label: 'Fees' },
           ]} />
-          <Text id="category-hint" variant="body-sm" tone="muted">Type to filter; click to select.</Text>
+          <Text id="category-hint" variant="body-sm" tone="muted">Type to filter; Arrow keys to move, Enter to choose.</Text>
+        </div>
+        <div className="stack">
+          <p className="cap">Disabled</p>
+          <Combobox disabled placeholder="Search categories…" options={[{ value: 'groceries', label: 'Groceries' }]} />
         </div>
         <Text variant="body-sm" tone="muted">
-          id / name / aria-* are routed to the inner search input, so clicking the label focuses the field.
+          Keyboard: <Kbd>↓</Kbd> / <Kbd>↑</Kbd> move the active row (wrapping), <Kbd>Home</Kbd> / <Kbd>End</Kbd> jump to the ends,
+          {' '}<Kbd>Enter</Kbd> commits it, <Kbd>Esc</Kbd> closes and discards the filter. Arrowing never fires onValueChange —
+          selection does not follow focus. id / name / aria-* are routed to the inner search input, so clicking the label focuses the field.
         </Text>
       </div>
     );
