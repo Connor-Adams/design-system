@@ -1,5 +1,112 @@
 # @connor-adams/designsystem
 
+## 3.0.0
+
+### Major Changes
+
+- 379f0b5: Make `Combobox` keyboard-operable, and make its `disabled` prop real.
+
+  `Combobox` shipped with no keyboard operation _at all_ — there was no `onKeyDown`
+  anywhere in it, so the only way to choose an option was a mouse click. It also
+  had no `role="combobox"`, `aria-expanded`, `aria-controls` or
+  `aria-activedescendant`: the input announced as a plain textbox with a `listbox`
+  floating next to it that nothing claimed to own. For anyone adopting it as an
+  accessibility upgrade over a native `<select>`, it was a downgrade.
+
+  It now implements the ARIA 1.2 combobox pattern with `aria-activedescendant`:
+
+  - **ArrowDown / ArrowUp** open the list and move the active row, wrapping at both
+    ends (the same wrap-around `Tabs` uses). Opening is seeded on the committed
+    value, else the first / last row.
+  - **Home / End** jump to the first / last row _while the list is open_, and are
+    left to the text caret while it is closed, so editing the filter still works.
+  - **Enter** commits the active row. With nothing active — or with the list closed
+    — Enter is left alone so a wrapping form still submits.
+  - **Escape** closes and discards the typed filter, leaving the committed value
+    untouched. Only claimed while the list is open: closed, it bubbles, so a
+    Combobox inside a `Dialog` no longer swallows the Dialog's Escape.
+  - **Alt+ArrowDown** opens without moving the active row; **Alt+ArrowUp** closes.
+  - **Tab** closes the list and is never `preventDefault`ed, so focus moves on.
+  - **Blur** behaves like Escape: the filter is discarded, the value stands.
+
+  `role="combobox"`, `aria-expanded`, `aria-controls`, `aria-haspopup="listbox"`,
+  `aria-autocomplete="list"` and `aria-activedescendant` now sit on the search
+  `<input>`, with ids derived from `React.useId()` so two Comboboxes on a page
+  never collide. The listbox stays mounted (`hidden` while closed) so
+  `aria-controls` always resolves; it is deliberately _not_
+  `aria-multiselectable`, since this is a single-select and `false` is the default.
+
+  **Selection does not follow focus.** Arrowing moves `aria-activedescendant`
+  only; `onValueChange` fires on Enter or a click. The APG allows either, and
+  `Tabs` in this package takes the other branch — but a tab strip's focus _is_ its
+  value, whereas here the active row and the committed value are separate, and
+  consumers reconcile, refetch and navigate on `onValueChange`.
+
+  `disabled` is now a real prop. It was never in `ComboboxProps`, so a consumer
+  passing it had it spread onto the presentational wrapper `<div>`, where it does
+  nothing — a silent no-op. It now reaches the inner `<input>` (which therefore
+  leaves the tab order), blocks opening by focus, click and key, and is reflected
+  as `data-disabled` on the wrapper, matching `Slider` and `Stepper`.
+
+  The active row is kept scrolled inside the panel's `max-height` by adjusting the
+  list's own `scrollTop` — never `scrollIntoView`, which would scroll ancestors
+  too.
+
+  **Breaking (twice over), which is why this is `major` and not `minor`:**
+
+  1. **`role="combobox"` changes what role queries find.** A consumer's
+     `getByRole('textbox')` — or any `[role=textbox]` / a11y-snapshot assertion —
+     stops matching the search input. Nine such queries in this package's own
+     `Combobox.test.tsx` broke and were migrated. Migration: query
+     `getByRole('combobox')`, or better `getByLabelText` / `getByRole('combobox',
+{ name })`, which survives future role changes.
+  2. **Options are no longer `<button>`s.** They are non-focusable
+     `<div role="option">` elements, because in the `aria-activedescendant` pattern
+     focus must stay on the input — and focusable options are exactly what made
+     Tab trap inside the open list. `getByRole('option')` and `aria-selected` are
+     unchanged; `getByRole('button')` and a `.ca-combobox-option` selector
+     assuming `button` semantics (or the now-removed
+     `.ca-combobox-option:focus-visible` ring) are not. The keyboard-active row is
+     styleable as `[data-highlighted="true"]`; `[data-active="true"]` still means
+     _selected_, unchanged.
+
+### Patch Changes
+
+- 4855a36: Fix `Field` labelling group-shaped controls (`Stepper`, `RadioGroup`, `ToggleGroup`).
+
+  `Field` wired every child the same way: inject `id`, point the label's `htmlFor`
+  at it. For a container carrying `role="group"` / `role="radiogroup"` that
+  associates with nothing — `htmlFor` only resolves to a _labelable_ element — so
+  clicking the label focused nothing and the group had no accessible name. It
+  failed silently, because the label still rendered as adjacent text and
+  `aria-describedby` still announced.
+
+  Those three controls now declare their shape, and `Field` names a group-shaped
+  child with `aria-labelledby` pointing at the label (which now always carries an
+  id) instead of `htmlFor` pointing at the control. `aria-describedby`,
+  `aria-invalid` and `aria-required` continue to land on the group root.
+  Labelable children are unchanged.
+
+- 1a5bddc: Fix `StatGrid`'s `divided` mode on a partial last row.
+
+  The interior hairlines are drawn as an outset box-shadow on each cell, which is
+  what lets the mode work under `columns="auto"` — the track count is not knowable
+  at author time, so there is no `:nth-child` math available. But the shadows were
+  on each cell's left and top edge, which means the rule between the last full row
+  and a partial one was drawn by the cells _below_ it. With seven cells across
+  three columns it therefore spanned only the first column and stopped in mid-air,
+  leaving the rest of that boundary blank and the trailing cell unclosed.
+
+  The shadows now sit on each cell's right and bottom edge instead. That makes the
+  horizontal rule the property of the row _above_ it, which is always full, so it
+  always spans the whole width; and the right edge closes off a lone trailing cell,
+  so the empty remainder reads as an empty cell rather than a missing rule. Fully
+  divisible grids are unchanged — which is why this went unnoticed, since every
+  existing divided demo used a cell count that divided evenly by its column count.
+
+  Adds a `DividedPartialRow` story and a gallery variant with a deliberately uneven
+  count so the case stays visible.
+
 ## 2.0.0
 
 ### Major Changes
